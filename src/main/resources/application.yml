@@ -4,3 +4,12 @@ spring:
     url: jdbc:mysql://127.0.0.1:3306/look_at_this
     username: root
     password: k1fl2rm34!A
+  jpa:
+    hibernate:
+      ddl-auto: update  # option type: create, create-drop, update, validate, none
+    properties:
+      hibernate:
+        diarect: org.hibernate.dialect.MySQLDialect  # 쿼리의 기준이 되는 데이터베이스 엔진을 설정합니다.
+        show_sql: true  # sql 쿼리를 보여줍니다.
+        format_sql: true  # sql query formatting
+        use_sql_comments: true  # sql 쿼리의 추가정보를 보여줍니다.
