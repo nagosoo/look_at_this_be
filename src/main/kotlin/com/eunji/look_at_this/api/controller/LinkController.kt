@@ -2,7 +2,7 @@ package com.eunji.look_at_this.api.controller
 
 import com.eunji.look_at_this.api.dto.LinkDto
 import com.eunji.look_at_this.api.dto.LinkDto.LinkReqDto
-import com.eunji.look_at_this.api.service.serviceImpl.LinkService
+import com.eunji.look_at_this.api.service.LinkService
 import com.eunji.look_at_this.common.utils.ApiUtils
 import com.eunji.look_at_this.common.utils.ApiUtils.ApiResult
 import lombok.RequiredArgsConstructor

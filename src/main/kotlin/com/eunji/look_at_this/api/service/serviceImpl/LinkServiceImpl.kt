@@ -3,6 +3,7 @@ package com.eunji.look_at_this.api.service.serviceImpl
 import com.eunji.look_at_this.api.dto.LinkDto
 import com.eunji.look_at_this.api.entity.Link
 import com.eunji.look_at_this.api.repository.LinkRepository
+import com.eunji.look_at_this.api.service.LinkService
 import lombok.RequiredArgsConstructor
 import lombok.extern.slf4j.Slf4j
 import org.springframework.stereotype.Service
