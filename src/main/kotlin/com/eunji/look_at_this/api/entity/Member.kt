@@ -14,6 +14,10 @@ data class Member(
         val memberEmail: String,
         @Column(nullable = false)
         val memberPassword: String,
+        @OneToOne(mappedBy = "linkClickHistoryMember")
+        val linkClickHistory: LinkClickHistory? = null,
+        @OneToOne(mappedBy = "bookMarkHistoryMember")
+        val bookMarkHistory: BookMarkHistory? = null,
 ) {
     @Builder
     constructor(

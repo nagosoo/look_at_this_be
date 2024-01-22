@@ -8,22 +8,22 @@ import lombok.NoArgsConstructor
 @Getter
 @NoArgsConstructor
 @Entity
-data class BookMarkHistory(
+data class LinkClickHistory(
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    val bookMarkHistoryId: Long,
+    val linkClickHistoryId: Long,
 
     @OneToOne
     @JoinColumn(name = "member_id")
-    val bookMarkHistoryMember: Member? = null,
+    val linkClickHistoryMember: Member? = null,
 
     @OneToOne
     @JoinColumn(name = "link_id")
-    val bookMarkHistoryLink: Link? = null,
+    val linkClickHistoryLink: Link? = null,
 ) {
     @Builder
     constructor(
-        bookMarkHistoryMember: Member,
-        bookMarkHistoryLink: Link
-    ) : this(0, bookMarkHistoryMember, bookMarkHistoryLink)
+        linkClickHistoryMember: Member,
+        linkClickHistoryLink: Link
+    ) : this(0, linkClickHistoryMember, linkClickHistoryLink)
 }
