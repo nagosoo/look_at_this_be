@@ -15,15 +15,16 @@ data class LinkClickHistory(
 
     @ManyToOne
     @JoinColumn(name = "member_id")
-    val linkClickHistoryMember: Member? = null,
+    val member: Member? = null,
 
     @ManyToOne
     @JoinColumn(name = "link_id")
-    val linkClickHistoryLink: Link? = null,
+    val link: Link? = null,
 ) {
     @Builder
     constructor(
-        linkClickHistoryMember: Member,
-        linkClickHistoryLink: Link
-    ) : this(0, linkClickHistoryMember, linkClickHistoryLink)
+        member: Member,
+        link: Link
+    ) : this(0, member, link)
+
 }

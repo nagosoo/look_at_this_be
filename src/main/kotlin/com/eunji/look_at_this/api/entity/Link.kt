@@ -20,9 +20,9 @@ data class Link(
     val linkThumbnail: String,
     @Column(nullable = false)
     val linkCreatedAt: LocalDateTime,
-    @OneToMany(mappedBy = "linkClickHistoryLink")
+    @OneToMany(mappedBy = "link")
     val linkClickHistories: MutableList<LinkClickHistory> = mutableListOf(),
-    @OneToMany(mappedBy = "bookMarkHistoryLink")
+    @OneToMany(mappedBy = "link")
     val bookMarkHistories: MutableList<BookMarkHistory> = mutableListOf()
 ) {
     @Builder

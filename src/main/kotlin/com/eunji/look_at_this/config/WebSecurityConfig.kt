@@ -29,7 +29,7 @@ class SecurityConfig {
                 .csrf().disable()
                 .cors().and()
                 .authorizeRequests()
-                .requestMatchers("/link").permitAll()
+                .requestMatchers("*").permitAll()
                 .and()
                 .build()
     }

@@ -14,9 +14,9 @@ data class Member(
         val memberEmail: String,
         @Column(nullable = false)
         val memberPassword: String,
-        @OneToMany(mappedBy = "linkClickHistoryMember")
+        @OneToMany(mappedBy = "member")
         val linkClickHistories: MutableList<LinkClickHistory> = mutableListOf(),
-        @OneToMany(mappedBy = "bookMarkHistoryMember")
+        @OneToMany(mappedBy = "member")
         val bookMarkHistories: MutableList<BookMarkHistory> = mutableListOf()
 ) {
     @Builder
