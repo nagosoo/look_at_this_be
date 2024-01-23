@@ -47,11 +47,12 @@ class LinkDto {
 
     }
 
-    //링크 읽었다는 표시 요청
+    //링크 읽었다, 북마크 했다는 표시 요청
     @Getter
     @NoArgsConstructor
-    class LinkReadReqDto @Builder constructor(var memberId: Long, var linkId: Long) {
+    class LinkReadOrBookmarkReqDto @Builder constructor(var memberId: Long, var linkId: Long) {
 
     }
+
 
 }

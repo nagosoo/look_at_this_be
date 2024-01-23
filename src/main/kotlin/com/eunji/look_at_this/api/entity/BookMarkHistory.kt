@@ -23,7 +23,7 @@ data class BookMarkHistory(
 ) {
     @Builder
     constructor(
-        bookMarkHistoryMember: Member,
-        bookMarkHistoryLink: Link
-    ) : this(0, bookMarkHistoryMember, bookMarkHistoryLink)
+        member: Member,
+        link: Link
+    ) : this(0, member, link)
 }

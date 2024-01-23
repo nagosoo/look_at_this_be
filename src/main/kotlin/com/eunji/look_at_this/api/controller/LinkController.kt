@@ -22,8 +22,13 @@ class LinkController(
     }
 
     @PostMapping("/read")
-    fun postReadLink(@RequestBody createReq: LinkDto.LinkReadReqDto?): ApiResult<Long?> {
+    fun postReadLink(@RequestBody createReq: LinkDto.LinkReadOrBookmarkReqDto?): ApiResult<Long?> {
         return ApiUtils.success(linkService.readLink(createReq!!))
+    }
+
+    @PostMapping("/bookmark")
+    fun postBookmarkLink(@RequestBody createReq: LinkDto.LinkReadOrBookmarkReqDto?): ApiResult<Long?> {
+        return ApiUtils.success(linkService.bookmarkLink(createReq!!))
     }
 
     //개발용

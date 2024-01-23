@@ -7,6 +7,6 @@ import org.springframework.data.jpa.repository.JpaRepository
 import org.springframework.stereotype.Repository
 
 @Repository
-interface LinkHistoryRepository : JpaRepository<LinkClickHistory, Long> {
+interface LinkClickHistoryRepository : JpaRepository<LinkClickHistory, Long> {
     fun findByMemberAndLink(member: Member, link: Link): LinkClickHistory?
 }

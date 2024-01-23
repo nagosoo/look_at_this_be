@@ -1,10 +1,12 @@
 package com.eunji.look_at_this.api.service.serviceImpl
 
 import com.eunji.look_at_this.api.dto.LinkDto
+import com.eunji.look_at_this.api.entity.BookMarkHistory
 import com.eunji.look_at_this.api.entity.Link
 import com.eunji.look_at_this.api.entity.LinkClickHistory
 import com.eunji.look_at_this.api.entity.Member
-import com.eunji.look_at_this.api.repository.LinkHistoryRepository
+import com.eunji.look_at_this.api.repository.LinkBookmarkHistoryRepository
+import com.eunji.look_at_this.api.repository.LinkClickHistoryRepository
 import com.eunji.look_at_this.api.repository.LinkRepository
 import com.eunji.look_at_this.api.repository.MemberRepository
 import com.eunji.look_at_this.api.service.LinkService
@@ -18,9 +20,10 @@ import java.time.LocalDateTime
 @RequiredArgsConstructor
 class LinkServiceImpl(
     private val linkRepository: LinkRepository,
-    private val linkHistoryRepository: LinkHistoryRepository,
+    private val linkHistoryRepository: LinkClickHistoryRepository,
     private val memberRepository: MemberRepository,
-    private val linkClickHistoryRepository: LinkHistoryRepository
+    private val linkClickHistoryRepository: LinkClickHistoryRepository,
+    private val bookmarkHistoryRepository: LinkBookmarkHistoryRepository,
 ) : LinkService {
 
     override fun getLinkListDev(): List<LinkDto.LinkResDtoDev> {
@@ -46,9 +49,9 @@ class LinkServiceImpl(
         }
     }
 
-    override fun readLink(linkReadReqDto: LinkDto.LinkReadReqDto): Long? {
-        val link: Link = linkRepository.findById(linkReadReqDto.linkId).get()
-        val member: Member = memberRepository.findById(linkReadReqDto.memberId).get()
+    override fun readLink(linkReadOrBookmarkReqDto: LinkDto.LinkReadOrBookmarkReqDto): Long? {
+        val link: Link = linkRepository.findById(linkReadOrBookmarkReqDto.linkId).get()
+        val member: Member = memberRepository.findById(linkReadOrBookmarkReqDto.memberId).get()
         val linkClickHistory = linkHistoryRepository.findByMemberAndLink(member, link)
         if (linkClickHistory == null) {
             //새로 read
@@ -73,6 +76,12 @@ class LinkServiceImpl(
             it.link?.linkId
         }
 
+        val bookmarkedLinks = bookmarkHistoryRepository.findAll().filter {
+            it.member?.memberId == linkListReqDto.memberId
+        }.map {
+            it.link?.linkId
+        }
+
         return allLinks.map {
             LinkDto.LinkListResDto(
                 linkId = it.linkId,
@@ -80,8 +89,28 @@ class LinkServiceImpl(
                 linkMemo = it.linkMemo,
                 linkThumbnail = it.linkThumbnail,
                 linkCreatedAt = it.linkCreatedAt.toString(),
-                linkIsRead = readLinks.contains(it.linkId)
+                linkIsRead = readLinks.contains(it.linkId),
+                linkIsBookmark = bookmarkedLinks.contains(it.linkId),
             )
+        }
+    }
+
+    override fun bookmarkLink(linkReadOrBookmarkReqDto: LinkDto.LinkReadOrBookmarkReqDto): Long? {
+        val link: Link = linkRepository.findById(linkReadOrBookmarkReqDto.linkId).get()
+        val member: Member = memberRepository.findById(linkReadOrBookmarkReqDto.memberId).get()
+        val linkBookmarkHistory = bookmarkHistoryRepository.findByMemberAndLink(member, link)
+        if (linkBookmarkHistory == null) {
+            //북마크 추가
+            BookMarkHistory(
+                member = member,
+                link = link,
+            ).apply {
+                return bookmarkHistoryRepository.save(this).bookMarkHistoryId
+            }
+        } else {
+            //북마크 해지
+            bookmarkHistoryRepository.delete(linkBookmarkHistory)
+            return linkBookmarkHistory.bookMarkHistoryId
         }
     }
 }
