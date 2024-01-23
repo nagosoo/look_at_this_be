@@ -3,7 +3,7 @@ spring:
     driver-class-name: com.mysql.cj.jdbc.Driver
     url: jdbc:mysql://127.0.0.1:3306/look_at_this
     username: root
-    password: Hanmo123!
+    password: k1fl2rm34!A
   jpa:
     hibernate:
       ddl-auto: update  # option type: create, create-drop, update, validate, none
