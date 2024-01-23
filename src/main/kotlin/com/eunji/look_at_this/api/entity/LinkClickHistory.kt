@@ -13,11 +13,11 @@ data class LinkClickHistory(
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     val linkClickHistoryId: Long,
 
-    @OneToOne
+    @ManyToOne
     @JoinColumn(name = "member_id")
     val linkClickHistoryMember: Member? = null,
 
-    @OneToOne
+    @ManyToOne
     @JoinColumn(name = "link_id")
     val linkClickHistoryLink: Link? = null,
 ) {

@@ -13,11 +13,11 @@ data class BookMarkHistory(
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     val bookMarkHistoryId: Long,
 
-    @OneToOne
+    @ManyToOne
     @JoinColumn(name = "member_id")
     val bookMarkHistoryMember: Member? = null,
 
-    @OneToOne
+    @ManyToOne
     @JoinColumn(name = "link_id")
     val bookMarkHistoryLink: Link? = null,
 ) {
