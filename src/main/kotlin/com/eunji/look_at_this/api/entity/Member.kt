@@ -7,21 +7,23 @@ import lombok.NoArgsConstructor
 @NoArgsConstructor
 @Entity
 data class Member(
-        @Id
-        @GeneratedValue(strategy = GenerationType.IDENTITY)
-        val memberId: Long,
-        @Column(nullable = false)
-        val memberEmail: String,
-        @Column(nullable = false)
-        val memberPassword: String,
-        @OneToMany(mappedBy = "member")
-        val linkClickHistories: MutableList<LinkClickHistory> = mutableListOf(),
-        @OneToMany(mappedBy = "member")
-        val bookMarkHistories: MutableList<BookMarkHistory> = mutableListOf()
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    val memberId: Long,
+    @Column(nullable = false)
+    val memberEmail: String,
+    @Column(nullable = false)
+    val memberPassword: String,
+    @Column(nullable = true)
+    val memberFcmToken: String? = null,
+    @OneToMany(mappedBy = "member")
+    val linkClickHistories: MutableList<LinkClickHistory> = mutableListOf(),
+    @OneToMany(mappedBy = "member")
+    val bookMarkHistories: MutableList<BookMarkHistory> = mutableListOf()
 ) {
     @Builder
     constructor(
-            memberEmail: String,
-            memberPassword: String
+        memberEmail: String,
+        memberPassword: String
     ) : this(0, memberEmail, memberPassword)
 }

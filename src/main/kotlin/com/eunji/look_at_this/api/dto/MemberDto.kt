@@ -5,17 +5,21 @@ import lombok.Getter
 import lombok.NoArgsConstructor
 
 class MemberDto {
+    @Getter
+    @NoArgsConstructor
+    data class MemberReqDto @Builder constructor(val memberEmail: String, val memberPassword: String)
 
     @Getter
     @NoArgsConstructor
-    class MemberReqDto @Builder constructor(var memberEmail: String, var memberPassword: String) {
+    data class MemberFcmReqDto @Builder constructor(val memberId: Long, val fcmToken: String)
 
-    }
 
     @Getter
     @NoArgsConstructor
-    class MemberResDto @Builder constructor(var memberId: Long, var memberEmail: String, var memberPassword: String) {
-
-    }
-
+    data class MemberResDto @Builder constructor(
+        val memberId: Long,
+        val memberEmail: String,
+        val memberPassword: String,
+        val memberFcmToken: String? = null
+    )
 }

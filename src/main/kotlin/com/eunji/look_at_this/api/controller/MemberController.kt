@@ -15,8 +15,13 @@ class MemberController(
         private val memberService: MemberService
 ) {
     @PostMapping
-    fun create(@RequestBody createReq: MemberDto.MemberReqDto?): ApiUtils.ApiResult<Long?> {
-        return ApiUtils.success(memberService.createMember(createReq!!))
+    fun create(@RequestBody createReq: MemberDto.MemberReqDto): ApiUtils.ApiResult<Long?> {
+        return ApiUtils.success(memberService.createMember(createReq))
+    }
+
+    @PostMapping("/fcm")
+    fun postFcmToken(@RequestBody createReq: MemberDto.MemberFcmReqDto): ApiUtils.ApiResult<Long?> {
+        return ApiUtils.success(memberService.postFcmToken(createReq))
     }
 
     @GetMapping

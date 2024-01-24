@@ -14,8 +14,8 @@ import org.springframework.stereotype.Service
 @Service
 @RequiredArgsConstructor
 class MemberServiceImpl(
-        private val memberRepository: MemberRepository,
-        private val passwordEncoder: BCryptPasswordEncoder
+    private val memberRepository: MemberRepository,
+    private val passwordEncoder: BCryptPasswordEncoder
 ) : MemberService {
     private val log = LoggerFactory.getLogger(this.javaClass)!!
     override fun createMember(memberReqDto: MemberDto.MemberReqDto): Long? {
@@ -26,9 +26,9 @@ class MemberServiceImpl(
         val hashedPassword = passwordEncoder.encode(memberReqDto.memberPassword)
 
         Member(
-                memberPassword = hashedPassword,
-                memberEmail = memberReqDto.memberEmail,
-                ).apply {
+            memberPassword = hashedPassword,
+            memberEmail = memberReqDto.memberEmail,
+        ).apply {
             return memberRepository.save(this).memberId
         }
     }
@@ -36,10 +36,19 @@ class MemberServiceImpl(
     override fun getMemberList(): List<MemberDto.MemberResDto?> {
         return memberRepository.findAll().map {
             MemberDto.MemberResDto(
-                    memberId = it.memberId,
-                    memberEmail = it.memberEmail,
-                    memberPassword = it.memberPassword,
+                memberId = it.memberId,
+                memberEmail = it.memberEmail,
+                memberPassword = it.memberPassword,
             )
+        }
+    }
+
+    override fun postFcmToken(memberFcmReqDto: MemberDto.MemberFcmReqDto): Long? {
+        val member = memberRepository.findById(memberFcmReqDto.memberId).orElse(null) ?: return null
+        member.copy(
+            memberFcmToken = memberFcmReqDto.fcmToken
+        ).apply {
+            return memberRepository.save(this).memberId
         }
     }
 }
