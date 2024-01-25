@@ -1,5 +1,6 @@
 package com.eunji.look_at_this.api.controller
 
+import com.eunji.look_at_this.api.dto.AlarmDto
 import com.eunji.look_at_this.api.dto.MemberDto
 import com.eunji.look_at_this.api.service.MemberService
 import com.eunji.look_at_this.common.utils.ApiUtils
@@ -25,13 +26,17 @@ class MemberController(
     }
 
     @PostMapping("/alarm")
-    fun postAlarm(@RequestBody postAlarmReqDto: MemberDto.MemberAlarmSettingReqDto): ApiUtils.ApiResult<Long?> {
+    fun postAlarm(@RequestBody postAlarmReqDto: MemberDto.MemberAlarmSettingPostReqDto): ApiUtils.ApiResult<Long?> {
         return ApiUtils.success(memberService.postAlarm(postAlarmReqDto))
     }
-
 
     @GetMapping
     fun getMemberList(): ApiUtils.ApiResult<List<MemberDto.MemberResDto?>> {
         return ApiUtils.success(memberService.getMemberList())
+    }
+
+    @GetMapping("/alarm")
+    fun getAlarmSetting(@RequestParam memberId:Long): ApiUtils.ApiResult<AlarmDto?> {
+        return ApiUtils.success(memberService.getAlarm(memberId))
     }
 }

@@ -1,5 +1,6 @@
 package com.eunji.look_at_this.api.service.serviceImpl
 
+import com.eunji.look_at_this.api.dto.FcmDto
 import com.eunji.look_at_this.api.dto.LinkDto
 import com.eunji.look_at_this.api.entity.BookMarkHistory
 import com.eunji.look_at_this.api.entity.Link
@@ -9,6 +10,7 @@ import com.eunji.look_at_this.api.repository.LinkBookmarkHistoryRepository
 import com.eunji.look_at_this.api.repository.LinkClickHistoryRepository
 import com.eunji.look_at_this.api.repository.LinkRepository
 import com.eunji.look_at_this.api.repository.MemberRepository
+import com.eunji.look_at_this.api.service.FCMNotificationService
 import com.eunji.look_at_this.api.service.LinkService
 import lombok.RequiredArgsConstructor
 import lombok.extern.slf4j.Slf4j
@@ -25,6 +27,7 @@ class LinkServiceImpl(
     private val memberRepository: MemberRepository,
     private val linkClickHistoryRepository: LinkClickHistoryRepository,
     private val bookmarkHistoryRepository: LinkBookmarkHistoryRepository,
+    private val fcmNotificationService: FCMNotificationService,
 ) : LinkService {
 
     override fun getLinkListDev(): List<LinkDto.LinkResDtoDev> {
@@ -52,7 +55,26 @@ class LinkServiceImpl(
             linkThumbnail = getThumbnail(linkReqDto.linkUrl),
             linkCreatedAt = LocalDateTime.now()
         ).apply {
+            postFcm()
             return linkRepository.save(this).linkId
+        }
+    }
+
+    private fun postFcm() {
+        memberRepository.findAll().filter {
+            it.keepReceiveAlarms
+        }.map {
+            it.memberFcmToken
+        }.forEach { fcmToken ->
+            fcmToken?.let {
+                fcmNotificationService.sendNotificationByUserToken(
+                    FcmDto.FCMNotificationRequestDto(
+                        fcmToken = fcmToken,
+                        title = "ㅇㅣㄱㅓ보ㅏ보ㅏ",
+                        body = "새로운 링크가 도착했오!",
+                    )
+                )
+            }
         }
     }
 

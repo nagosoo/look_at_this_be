@@ -4,10 +4,21 @@ import lombok.Getter
 import lombok.NoArgsConstructor
 
 
-@Getter
-@NoArgsConstructor
-data class FCMNotificationRequestDto(
-    val targetUserId: Long,
-    val title: String,
-    val body: String
-)
+
+class FcmDto {
+    @Getter
+    @NoArgsConstructor
+    data class FCMNotificationRequestDtoDev(
+        val targetUserId: Long,
+        val title: String,
+        val body: String
+    )
+
+    @Getter
+    @NoArgsConstructor
+    data class FCMNotificationRequestDto(
+        val fcmToken: String,
+        val title: String,
+        val body: String
+    )
+}

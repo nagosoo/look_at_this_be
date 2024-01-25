@@ -1,6 +1,6 @@
 package com.eunji.look_at_this.api.service
 
-import com.eunji.look_at_this.api.dto.FCMNotificationRequestDto
+import com.eunji.look_at_this.api.dto.FcmDto
 import com.eunji.look_at_this.api.repository.MemberRepository
 import com.google.firebase.messaging.*
 import lombok.RequiredArgsConstructor
@@ -15,7 +15,39 @@ class FCMNotificationService(
     private val memberRepository: MemberRepository,
 ) {
 
-    fun sendNotificationByToken(requestDto: FCMNotificationRequestDto): String {
+    fun sendNotificationByUserToken(requestDto: FcmDto.FCMNotificationRequestDto): String {
+
+            val notification: Notification = Notification.builder()
+                .setTitle(requestDto.title)
+                .setBody(requestDto.body) // .setImage(requestDto.getImage())
+                .build()
+
+            val message: Message = Message.builder()
+                .setToken(requestDto.fcmToken)
+                .setNotification(notification) // .putAllData(requestDto.getData())
+                .setAndroidConfig(
+                    AndroidConfig.builder()
+                        .setPriority(AndroidConfig.Priority.HIGH)
+                        .setNotification(
+                            AndroidNotification.builder()
+                                .setChannelId("CHANNEL_ID")
+                                .build()
+                        )
+                        .build()
+                )
+                .build()
+
+            try {
+                firebaseMessaging.send(message)
+                return "알림을 성공적으로 전송했습니다. targetUserId=" + requestDto.fcmToken
+            } catch (e: FirebaseMessagingException) {
+                e.printStackTrace()
+                return "알림 보내기를 실패하였습니다. targetUserId=" + requestDto.fcmToken
+            }
+
+    }
+
+    fun sendNotificationByUserId(requestDto: FcmDto.FCMNotificationRequestDtoDev): String {
 
         val member = memberRepository.findById(requestDto.targetUserId)
 
