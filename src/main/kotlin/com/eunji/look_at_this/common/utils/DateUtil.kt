@@ -13,6 +13,7 @@ object DateUtil {
             AlarmTime.PM_15.time -> getLocalDateTime(time)
             AlarmTime.PM_20.time -> getLocalDateTime(time)
             else -> throw IllegalArgumentException("잘못된 시간 형식입니다.")
+            //  else -> getLocalDateTime(time)
         }
     }
 
