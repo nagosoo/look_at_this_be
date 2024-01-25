@@ -41,6 +41,7 @@ dependencies {
     implementation 'org.springframework.security:spring-security-config:6.0.5'
     implementation 'com.google.firebase:firebase-admin:9.1.1'
     implementation group: 'com.squareup.okhttp3', name: 'okhttp', version: '4.10.0-RC1'
+    implementation 'org.jsoup:jsoup:1.17.2'
 }
 
 tasks.withType(KotlinCompile) {

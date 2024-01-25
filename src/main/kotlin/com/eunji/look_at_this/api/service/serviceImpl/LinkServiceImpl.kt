@@ -12,6 +12,7 @@ import com.eunji.look_at_this.api.repository.MemberRepository
 import com.eunji.look_at_this.api.service.LinkService
 import lombok.RequiredArgsConstructor
 import lombok.extern.slf4j.Slf4j
+import org.jsoup.Jsoup
 import org.springframework.stereotype.Service
 import java.time.LocalDateTime
 
@@ -38,11 +39,17 @@ class LinkServiceImpl(
         }
     }
 
+    fun getThumbnail(linkUrl: String): String {
+        Jsoup.connect(linkUrl).get().run {
+            return this.select("meta[property=og:image]").attr("content")
+        }
+    }
+
     override fun createLink(linkReqDto: LinkDto.LinkReqDto): Long? {
         Link(
             linkUrl = linkReqDto.linkUrl,
             linkMemo = linkReqDto.linkMemo,
-            linkThumbnail = "https://i.namu.wiki/i/H3V9ZKvZivijkPM2wPfXOyRZWjc77sJPzRJGGD1YiAYshpQQUSXxNgR4b3VjVQWniomnar2CrcF_vBoRfo0-YwjWnV4qYA7g57wrbw1N4sYuBaY2PlKrqahMYIpptVhFvWFAHSelK_Kz-HOoQgtFVQ.webp",
+            linkThumbnail = getThumbnail(linkReqDto.linkUrl),
             linkCreatedAt = LocalDateTime.now()
         ).apply {
             return linkRepository.save(this).linkId
