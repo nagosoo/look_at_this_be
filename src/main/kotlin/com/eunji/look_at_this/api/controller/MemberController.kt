@@ -12,7 +12,7 @@ import org.springframework.web.bind.annotation.*
 @RequestMapping("/member")
 @RequiredArgsConstructor
 class MemberController(
-        private val memberService: MemberService
+    private val memberService: MemberService
 ) {
     @PostMapping
     fun create(@RequestBody createReq: MemberDto.MemberReqDto): ApiUtils.ApiResult<Long?> {
@@ -23,6 +23,12 @@ class MemberController(
     fun postFcmToken(@RequestBody createReq: MemberDto.MemberFcmReqDto): ApiUtils.ApiResult<Long?> {
         return ApiUtils.success(memberService.postFcmToken(createReq))
     }
+
+    @PostMapping("/alarm")
+    fun postAlarm(@RequestBody postAlarmReqDto: MemberDto.MemberAlarmSettingReqDto): ApiUtils.ApiResult<Long?> {
+        return ApiUtils.success(memberService.postAlarm(postAlarmReqDto))
+    }
+
 
     @GetMapping
     fun getMemberList(): ApiUtils.ApiResult<List<MemberDto.MemberResDto?>> {

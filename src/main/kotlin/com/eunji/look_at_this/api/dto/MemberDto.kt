@@ -3,6 +3,7 @@ package com.eunji.look_at_this.api.dto
 import lombok.Builder
 import lombok.Getter
 import lombok.NoArgsConstructor
+import java.sql.Time
 
 class MemberDto {
     @Getter
@@ -13,6 +14,9 @@ class MemberDto {
     @NoArgsConstructor
     data class MemberFcmReqDto @Builder constructor(val memberId: Long, val fcmToken: String)
 
+    @NoArgsConstructor
+    data class MemberAlarmSettingReqDto @Builder constructor(val memberId: Long, val alarmDto: AlarmDto)
+
 
     @Getter
     @NoArgsConstructor
@@ -20,6 +24,7 @@ class MemberDto {
         val memberId: Long,
         val memberEmail: String,
         val memberPassword: String,
-        val memberFcmToken: String? = null
+        val memberFcmToken: String? = null,
+        val memberAlarmSetting: AlarmDto,
     )
 }

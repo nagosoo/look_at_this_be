@@ -1,9 +1,12 @@
 package com.eunji.look_at_this.api.service.serviceImpl
 
+import com.eunji.look_at_this.api.dto.AlarmDto
 import com.eunji.look_at_this.api.dto.MemberDto
 import com.eunji.look_at_this.api.entity.Member
 import com.eunji.look_at_this.api.repository.MemberRepository
 import com.eunji.look_at_this.api.service.MemberService
+import com.eunji.look_at_this.common.utils.DateUtil
+import com.eunji.look_at_this.common.utils.DateUtil.parseTimeToString
 import lombok.RequiredArgsConstructor
 import lombok.extern.slf4j.Slf4j
 import org.slf4j.LoggerFactory
@@ -39,6 +42,11 @@ class MemberServiceImpl(
                 memberId = it.memberId,
                 memberEmail = it.memberEmail,
                 memberPassword = it.memberPassword,
+                memberFcmToken = it.memberFcmToken,
+                memberAlarmSetting = AlarmDto(
+                    keepReceiveAlarms = it.keepReceiveAlarms,
+                    alarmTime = parseTimeToString(it.alarmTime)
+                )
             )
         }
     }
@@ -50,5 +58,20 @@ class MemberServiceImpl(
         ).apply {
             return memberRepository.save(this).memberId
         }
+    }
+
+    override fun postAlarm(memberAlarmSettingReqDto: MemberDto.MemberAlarmSettingReqDto): Long? {
+        val member = memberRepository.findById(memberAlarmSettingReqDto.memberId).orElse(null) ?: return null
+        val modifiedMember = if (memberAlarmSettingReqDto.alarmDto.keepReceiveAlarms) {
+            member.copy(
+                keepReceiveAlarms = memberAlarmSettingReqDto.alarmDto.keepReceiveAlarms,
+            )
+        } else {
+            member.copy(
+                keepReceiveAlarms = memberAlarmSettingReqDto.alarmDto.keepReceiveAlarms,
+                alarmTime = DateUtil.parseStringToTime(memberAlarmSettingReqDto.alarmDto.alarmTime),
+            )
+        }
+        return memberRepository.save(modifiedMember).memberId
     }
 }
