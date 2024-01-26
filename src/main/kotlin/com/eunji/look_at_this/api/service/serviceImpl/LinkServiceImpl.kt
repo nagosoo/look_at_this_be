@@ -1,5 +1,6 @@
 package com.eunji.look_at_this.api.service.serviceImpl
 
+import com.eunji.look_at_this.api.dto.CursorResult
 import com.eunji.look_at_this.api.dto.FcmDto
 import com.eunji.look_at_this.api.dto.LinkDto
 import com.eunji.look_at_this.api.entity.BookMarkHistory
@@ -15,8 +16,10 @@ import com.eunji.look_at_this.api.service.LinkService
 import lombok.RequiredArgsConstructor
 import lombok.extern.slf4j.Slf4j
 import org.jsoup.Jsoup
+import org.springframework.data.domain.Pageable
 import org.springframework.stereotype.Service
 import java.time.LocalDateTime
+
 
 @Slf4j
 @Service
@@ -96,8 +99,60 @@ class LinkServiceImpl(
         }
     }
 
-    override fun getLinkList(linkListReqDto: LinkDto.LinkListReqDto): List<LinkDto.LinkListResDto> {
-        val allLinks = linkRepository.findAll()
+//    override fun getLinkList(linkListReqDto: LinkDto.LinkListReqDto): List<LinkDto.LinkListResDto> {
+//        val allLinks = linkRepository.findAll()
+//
+//        val readLinks = linkClickHistoryRepository.findAll().filter {
+//            it.member?.memberId == linkListReqDto.memberId
+//        }.map {
+//            it.link?.linkId
+//        }
+//
+//        val bookmarkedLinks = bookmarkHistoryRepository.findAll().filter {
+//            it.member?.memberId == linkListReqDto.memberId
+//        }.map {
+//            it.link?.linkId
+//        }
+//
+//        return allLinks.map {
+//            LinkDto.LinkListResDto(
+//                linkId = it.linkId,
+//                linkUrl = it.linkUrl,
+//                linkMemo = it.linkMemo,
+//                linkThumbnail = it.linkThumbnail,
+//                linkCreatedAt = it.linkCreatedAt.toString(),
+//                linkIsRead = readLinks.contains(it.linkId),
+//                linkIsBookmark = bookmarkedLinks.contains(it.linkId),
+//            )
+//        }
+//    }
+
+    private fun getLinks(id: Long?, page: Pageable): List<Link> {
+        if (id == null) return this.linkRepository.findAllByOrderByLinkIdDesc(page)
+        return this.linkRepository.findByLinkIdLessThanOrderByLinkIdDesc(
+            id,
+            page
+        )
+    }
+
+    private fun hasNext(id: Long?): Boolean {
+        if (id == null) return false
+        return this.linkRepository.existsByLinkIdLessThan(id)
+    }
+
+    private fun getNextCursorId(lastCursorId: Long?): Long? {
+        if (lastCursorId == null) return null
+        return if (lastCursorId > 1) lastCursorId else null
+    }
+
+    override fun getLinkList(
+        linkListReqDto: LinkDto.LinkListReqDto,
+        cursorId: Long?,
+        pageSize: Pageable
+    ): CursorResult<LinkDto.LinkListResDto> {
+
+        val allLinks: List<Link> = getLinks(cursorId, pageSize)
+        val lastIdOfList: Long? = if (allLinks.isEmpty()) null else allLinks.last().linkId
 
         val readLinks = linkClickHistoryRepository.findAll().filter {
             it.member?.memberId == linkListReqDto.memberId
@@ -111,7 +166,7 @@ class LinkServiceImpl(
             it.link?.linkId
         }
 
-        return allLinks.map {
+        val linksRes = allLinks.map {
             LinkDto.LinkListResDto(
                 linkId = it.linkId,
                 linkUrl = it.linkUrl,
@@ -122,6 +177,8 @@ class LinkServiceImpl(
                 linkIsBookmark = bookmarkedLinks.contains(it.linkId),
             )
         }
+
+        return CursorResult<LinkDto.LinkListResDto>(linksRes, hasNext(lastIdOfList),getNextCursorId(lastIdOfList))
     }
 
     override fun bookmarkLink(linkReadOrBookmarkReqDto: LinkDto.LinkReadOrBookmarkReqDto): Long? {
