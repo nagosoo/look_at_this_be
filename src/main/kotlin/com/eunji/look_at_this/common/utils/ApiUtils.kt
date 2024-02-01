@@ -12,29 +12,22 @@ object ApiUtils {
     fun <T> fail(response: T): ApiResult<T> {
         return ApiResult(false, response, null)
     }
-
-    fun error(throwable: Throwable, status: HttpStatus): ApiResult<*> {
-        return ApiResult<Any?>(false, null, ApiError(throwable, status))
+    fun error(message: String?): ApiResult<*> {
+        return ApiResult<Any?>(false, null, message)
     }
 
-    fun error(message: String?, status: HttpStatus): ApiResult<*> {
-        return ApiResult<Any?>(false, null, ApiError(message, status))
-    }
+    class ApiError internal constructor(val message: String?) {
 
-    class ApiError internal constructor(val message: String?, status: HttpStatus) {
-        val status: Int = status.value()
-
-        internal constructor(throwable: Throwable, status: HttpStatus) : this(throwable.message, status)
+        internal constructor(throwable: Throwable) : this(throwable.message)
 
         override fun toString(): String {
             return ToStringBuilder(this, ToStringStyle.SHORT_PREFIX_STYLE)
                     .append("message", message)
-                    .append("status", status)
                     .toString()
         }
     }
 
-    class ApiResult<T>(val isSuccess: Boolean, val response: T, val error: ApiError?) {
+    class ApiResult<T>(val isSuccess: Boolean, val response: T, val error: String?) {
         override fun toString(): String {
             return ToStringBuilder(this, ToStringStyle.SHORT_PREFIX_STYLE)
                     .append("success", isSuccess)
