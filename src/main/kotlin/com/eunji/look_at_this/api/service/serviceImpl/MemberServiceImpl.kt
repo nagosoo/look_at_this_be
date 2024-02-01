@@ -5,6 +5,7 @@ import com.eunji.look_at_this.api.dto.MemberDto
 import com.eunji.look_at_this.api.entity.Member
 import com.eunji.look_at_this.api.repository.MemberRepository
 import com.eunji.look_at_this.api.service.MemberService
+import com.eunji.look_at_this.common.exception.FoundException
 import com.eunji.look_at_this.common.utils.DateUtil
 import com.eunji.look_at_this.common.utils.DateUtil.parseTimeToString
 import lombok.RequiredArgsConstructor
@@ -24,7 +25,7 @@ class MemberServiceImpl(
     override fun createMember(memberReqDto: MemberDto.MemberReqDto): Long? {
         if (memberRepository.getMembersByMemberEmail(memberReqDto.memberEmail).isEmpty.not()) {
             log.debug("이미 존재하는 회원입니다.")
-            return null
+            throw FoundException("이미 존재하는 회원입니다.")
         }
         val hashedPassword = passwordEncoder.encode(memberReqDto.memberPassword)
 
