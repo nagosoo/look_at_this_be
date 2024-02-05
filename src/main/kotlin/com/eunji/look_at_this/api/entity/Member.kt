@@ -16,6 +16,8 @@ data class Member(
     val memberEmail: String,
     @Column(nullable = false)
     val memberPassword: String,
+    @Column(nullable = false)
+    val memberBasicToken: String,
     @Column(nullable = true)
     val memberFcmToken: String? = null,
     @Column(nullable = false)
@@ -30,6 +32,7 @@ data class Member(
     @Builder
     constructor(
         memberEmail: String,
-        memberPassword: String
-    ) : this(0, memberEmail, memberPassword)
+        memberPassword: String,
+        memberBasicToken: String
+    ) : this(0, memberEmail, memberPassword, memberBasicToken)
 }

@@ -26,13 +26,13 @@ class MemberController(
     }
 
     @PostMapping("/fcm")
-    fun postFcmToken(@RequestBody createReq: MemberDto.MemberFcmReqDto): ApiUtils.ApiResult<Long?> {
-        return ApiUtils.success(memberService.postFcmToken(createReq))
+    fun postFcmToken(@RequestHeader("Authorization") token: String, @RequestBody createReq: MemberDto.MemberFcmReqDto): ApiUtils.ApiResult<Long?> {
+        return ApiUtils.success(memberService.postFcmToken(createReq, token))
     }
 
     @PostMapping("/alarm")
-    fun postAlarm(@RequestBody postAlarmReqDto: MemberDto.MemberAlarmSettingPostReqDto): ApiUtils.ApiResult<Long?> {
-        return ApiUtils.success(memberService.postAlarm(postAlarmReqDto))
+    fun postAlarm(@RequestHeader("Authorization") token: String, @RequestBody postAlarmReqDto: MemberDto.MemberAlarmSettingPostReqDto): ApiUtils.ApiResult<Long?> {
+        return ApiUtils.success(memberService.postAlarm(postAlarmReqDto,token))
     }
 
     @GetMapping
@@ -41,7 +41,7 @@ class MemberController(
     }
 
     @GetMapping("/alarm")
-    fun getAlarmSetting(@RequestParam memberId:Long): ApiUtils.ApiResult<AlarmDto?> {
-        return ApiUtils.success(memberService.getAlarm(memberId))
+    fun getAlarmSetting(@RequestHeader("Authorization") token: String): ApiUtils.ApiResult<AlarmDto?> {
+        return ApiUtils.success(memberService.getAlarm(token))
     }
 }

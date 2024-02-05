@@ -9,6 +9,7 @@ import com.eunji.look_at_this.common.exception.FoundException
 import com.eunji.look_at_this.common.exception.NotFoundException
 import com.eunji.look_at_this.common.utils.DateUtil
 import com.eunji.look_at_this.common.utils.DateUtil.parseTimeToString
+import com.eunji.look_at_this.common.utils.TokenUtils
 import lombok.RequiredArgsConstructor
 import lombok.extern.slf4j.Slf4j
 import org.slf4j.LoggerFactory
@@ -29,14 +30,16 @@ class MemberServiceImpl(
             throw FoundException("이미 존재하는 아이디야ㅠ_ㅠ")
         }
         val hashedPassword = passwordEncoder.encode(memberReqDto.memberPassword)
+        val token = getMemberToken(memberReqDto.memberEmail, hashedPassword)
 
         Member(
+            memberBasicToken = token,
             memberPassword = hashedPassword,
             memberEmail = memberReqDto.memberEmail,
         ).apply {
             memberRepository.save(this)
         }
-        return getMemberToken(memberReqDto.memberEmail, hashedPassword)
+        return token
     }
 
     override fun logIn(memberReqDto: MemberDto.MemberReqDto): String? {
@@ -69,13 +72,15 @@ class MemberServiceImpl(
                 memberAlarmSetting = AlarmDto(
                     keepReceiveAlarms = it.keepReceiveAlarms,
                     alarmTime = parseTimeToString(it.alarmTime)
-                )
+                ),
+                memberBasicToken = it.memberBasicToken
             )
         }
     }
 
-    override fun postFcmToken(memberFcmReqDto: MemberDto.MemberFcmReqDto): Long? {
-        val member = memberRepository.findById(memberFcmReqDto.memberId).orElse(null) ?: return null
+    override fun postFcmToken(memberFcmReqDto: MemberDto.MemberFcmReqDto, token: String): Long? {
+        val memberId =TokenUtils.getMemberIdByToken(token, memberRepository)
+        val member = memberRepository.findById(memberId).orElse(null) ?: return null
         member.copy(
             memberFcmToken = memberFcmReqDto.fcmToken
         ).apply {
@@ -83,8 +88,9 @@ class MemberServiceImpl(
         }
     }
 
-    override fun postAlarm(memberAlarmSettingPostReqDto: MemberDto.MemberAlarmSettingPostReqDto): Long? {
-        val member = memberRepository.findById(memberAlarmSettingPostReqDto.memberId).orElse(null) ?: return null
+    override fun postAlarm(memberAlarmSettingPostReqDto: MemberDto.MemberAlarmSettingPostReqDto, token: String): Long? {
+        val memberId =TokenUtils.getMemberIdByToken(token, memberRepository)
+        val member = memberRepository.findById(memberId).orElse(null) ?: return null
         val modifiedMember = if (memberAlarmSettingPostReqDto.alarmDto.keepReceiveAlarms) {
             member.copy(
                 keepReceiveAlarms = memberAlarmSettingPostReqDto.alarmDto.keepReceiveAlarms,
@@ -98,7 +104,8 @@ class MemberServiceImpl(
         return memberRepository.save(modifiedMember).memberId
     }
 
-    override fun getAlarm(memberId: Long): AlarmDto? {
+    override fun getAlarm(token: String): AlarmDto? {
+        val memberId =TokenUtils.getMemberIdByToken(token, memberRepository)
         val member = memberRepository.findById(memberId).orElse(null) ?: return null
         return AlarmDto(
             keepReceiveAlarms = member.keepReceiveAlarms,

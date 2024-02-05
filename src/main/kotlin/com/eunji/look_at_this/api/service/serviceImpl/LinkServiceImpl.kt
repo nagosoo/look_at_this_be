@@ -13,6 +13,7 @@ import com.eunji.look_at_this.api.repository.LinkRepository
 import com.eunji.look_at_this.api.repository.MemberRepository
 import com.eunji.look_at_this.api.service.FCMNotificationService
 import com.eunji.look_at_this.api.service.LinkService
+import com.eunji.look_at_this.common.utils.TokenUtils
 import lombok.RequiredArgsConstructor
 import lombok.extern.slf4j.Slf4j
 import org.jsoup.Jsoup
@@ -45,13 +46,13 @@ class LinkServiceImpl(
         }
     }
 
-    fun getThumbnail(linkUrl: String): String {
+    private fun getThumbnail(linkUrl: String): String {
         Jsoup.connect(linkUrl).get().run {
             return this.select("meta[property=og:image]").attr("content")
         }
     }
 
-    override fun createLink(linkReqDto: LinkDto.LinkReqDto): Long? {
+    override fun createLink(linkReqDto: LinkDto.LinkReqDto, token: String): Long? {
         Link(
             linkUrl = linkReqDto.linkUrl,
             linkMemo = linkReqDto.linkMemo,
@@ -59,6 +60,7 @@ class LinkServiceImpl(
             linkCreatedAt = LocalDateTime.now()
         ).apply {
             postFcm()
+            readLink(token, LinkDto.LinkReadOrBookmarkReqDto(linkRepository.save(this).linkId))
             return linkRepository.save(this).linkId
         }
     }
@@ -81,9 +83,10 @@ class LinkServiceImpl(
         }
     }
 
-    override fun readLink(linkReadOrBookmarkReqDto: LinkDto.LinkReadOrBookmarkReqDto): Long? {
+    override fun readLink(token: String, linkReadOrBookmarkReqDto: LinkDto.LinkReadOrBookmarkReqDto): Long? {
         val link: Link = linkRepository.findById(linkReadOrBookmarkReqDto.linkId).get()
-        val member: Member = memberRepository.findById(linkReadOrBookmarkReqDto.memberId).get()
+        val memberId = TokenUtils.getMemberIdByToken(token, memberRepository)
+        val member: Member = memberRepository.findById(memberId).get()
         val linkClickHistory = linkHistoryRepository.findByMemberAndLink(member, link)
         if (linkClickHistory == null) {
             //새로 read
@@ -98,34 +101,6 @@ class LinkServiceImpl(
             return linkClickHistory.linkClickHistoryId
         }
     }
-
-//    override fun getLinkList(linkListReqDto: LinkDto.LinkListReqDto): List<LinkDto.LinkListResDto> {
-//        val allLinks = linkRepository.findAll()
-//
-//        val readLinks = linkClickHistoryRepository.findAll().filter {
-//            it.member?.memberId == linkListReqDto.memberId
-//        }.map {
-//            it.link?.linkId
-//        }
-//
-//        val bookmarkedLinks = bookmarkHistoryRepository.findAll().filter {
-//            it.member?.memberId == linkListReqDto.memberId
-//        }.map {
-//            it.link?.linkId
-//        }
-//
-//        return allLinks.map {
-//            LinkDto.LinkListResDto(
-//                linkId = it.linkId,
-//                linkUrl = it.linkUrl,
-//                linkMemo = it.linkMemo,
-//                linkThumbnail = it.linkThumbnail,
-//                linkCreatedAt = it.linkCreatedAt.toString(),
-//                linkIsRead = readLinks.contains(it.linkId),
-//                linkIsBookmark = bookmarkedLinks.contains(it.linkId),
-//            )
-//        }
-//    }
 
     private fun getLinks(id: Long?, page: Pageable): List<Link> {
         if (id == null) return this.linkRepository.findAllByOrderByLinkIdDesc(page)
@@ -146,22 +121,24 @@ class LinkServiceImpl(
     }
 
     override fun getLinkList(
-        linkListReqDto: LinkDto.LinkListReqDto,
         cursorId: Long?,
-        pageSize: Pageable
+        pageSize: Pageable,
+        token: String
     ): CursorResult<LinkDto.LinkListResDto> {
 
         val allLinks: List<Link> = getLinks(cursorId, pageSize)
         val lastIdOfList: Long? = if (allLinks.isEmpty()) null else allLinks.last().linkId
 
+        val memberId =TokenUtils.getMemberIdByToken(token, memberRepository)
+
         val readLinks = linkClickHistoryRepository.findAll().filter {
-            it.member?.memberId == linkListReqDto.memberId
+            it.member?.memberId == memberId
         }.map {
             it.link?.linkId
         }
 
         val bookmarkedLinks = bookmarkHistoryRepository.findAll().filter {
-            it.member?.memberId == linkListReqDto.memberId
+            it.member?.memberId == memberId
         }.map {
             it.link?.linkId
         }
@@ -178,12 +155,13 @@ class LinkServiceImpl(
             )
         }
 
-        return CursorResult<LinkDto.LinkListResDto>(linksRes, hasNext(lastIdOfList),getNextCursorId(lastIdOfList))
+        return CursorResult<LinkDto.LinkListResDto>(linksRes, hasNext(lastIdOfList), getNextCursorId(lastIdOfList))
     }
 
-    override fun bookmarkLink(linkReadOrBookmarkReqDto: LinkDto.LinkReadOrBookmarkReqDto): Long? {
+    override fun bookmarkLink(token: String, linkReadOrBookmarkReqDto: LinkDto.LinkReadOrBookmarkReqDto): Long? {
         val link: Link = linkRepository.findById(linkReadOrBookmarkReqDto.linkId).get()
-        val member: Member = memberRepository.findById(linkReadOrBookmarkReqDto.memberId).get()
+        val memberId =TokenUtils.getMemberIdByToken(token, memberRepository)
+        val member: Member = memberRepository.findById(memberId).get()
         val linkBookmarkHistory = bookmarkHistoryRepository.findByMemberAndLink(member, link)
         if (linkBookmarkHistory == null) {
             //북마크 추가

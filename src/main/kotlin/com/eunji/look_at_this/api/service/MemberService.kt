@@ -7,7 +7,7 @@ interface MemberService {
     fun createMember(memberReqDto: MemberDto.MemberReqDto): String?
     fun logIn(memberReqDto: MemberDto.MemberReqDto): String?
     fun getMemberList(): List<MemberDto.MemberResDto?>
-    fun postFcmToken(memberFcmReqDto: MemberDto.MemberFcmReqDto): Long?
-    fun postAlarm(memberAlarmSettingPostReqDto: MemberDto.MemberAlarmSettingPostReqDto): Long?
-    fun getAlarm(memberId:Long): AlarmDto?
+    fun postFcmToken(memberFcmReqDto: MemberDto.MemberFcmReqDto, token: String): Long?
+    fun postAlarm(memberAlarmSettingPostReqDto: MemberDto.MemberAlarmSettingPostReqDto, token: String): Long?
+    fun getAlarm(token:String): AlarmDto?
 }

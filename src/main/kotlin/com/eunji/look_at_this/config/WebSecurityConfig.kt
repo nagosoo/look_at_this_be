@@ -45,7 +45,7 @@ class SecurityConfig {
         val users: User.UserBuilder = User.builder()
         val user: UserDetails = users
             .username("nagosoo2")
-            .password(bCryptPasswordEncoder.encode("\$2a\$10\$k9qML5wuOydpkvKd7ffGiuaz3U4vwWOUTFTNhs1OYA3eppVIzTu6W"))
+            .password(bCryptPasswordEncoder.encode("\$2a\$10\$pExdAHEOR3LCpODWZYooX.lBNBvJ41XzRlApnqm1eQttDXIeEBPM6"))
             .roles("USER")
             .build()
         return InMemoryUserDetailsManager(user)

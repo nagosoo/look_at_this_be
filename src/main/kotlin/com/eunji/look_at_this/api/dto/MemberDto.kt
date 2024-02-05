@@ -11,10 +11,10 @@ class MemberDto {
 
     @Getter
     @NoArgsConstructor
-    data class MemberFcmReqDto @Builder constructor(val memberId: Long, val fcmToken: String)
+    data class MemberFcmReqDto @Builder constructor(val fcmToken: String)
 
     @NoArgsConstructor
-    data class MemberAlarmSettingPostReqDto @Builder constructor(val memberId: Long, val alarmDto: AlarmDto)
+    data class MemberAlarmSettingPostReqDto @Builder constructor(val alarmDto: AlarmDto)
 
     @Getter
     @NoArgsConstructor
@@ -24,5 +24,6 @@ class MemberDto {
         val memberPassword: String,
         val memberFcmToken: String? = null,
         val memberAlarmSetting: AlarmDto,
+        val memberBasicToken: String
     )
 }

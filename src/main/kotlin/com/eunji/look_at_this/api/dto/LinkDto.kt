@@ -40,17 +40,11 @@ class LinkDto {
 
     }
 
-    //링크 조회 요청
-    @Getter
-    @NoArgsConstructor
-    class LinkListReqDto @Builder constructor(var memberId:Long) {
-
-    }
 
     //링크 읽었다, 북마크 했다는 표시 요청
     @Getter
     @NoArgsConstructor
-    class LinkReadOrBookmarkReqDto @Builder constructor(var memberId: Long, var linkId: Long) {
+    class LinkReadOrBookmarkReqDto @Builder constructor(var linkId: Long) {
 
     }
 

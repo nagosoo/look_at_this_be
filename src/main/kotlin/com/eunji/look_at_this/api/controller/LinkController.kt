@@ -22,18 +22,18 @@ class LinkController(
     private val linkService: LinkService
 ) {
     @PostMapping
-    fun create(@RequestBody createReq: LinkReqDto?): ApiResult<Long?> {
-        return ApiUtils.success(linkService.createLink(createReq!!))
+    fun create(@RequestHeader("Authorization") token: String, @RequestBody createReq: LinkReqDto?): ApiResult<Long?> {
+        return ApiUtils.success(linkService.createLink(createReq!!, token))
     }
 
     @PostMapping("/read")
-    fun postReadLink(@RequestBody createReq: LinkDto.LinkReadOrBookmarkReqDto?): ApiResult<Long?> {
-        return ApiUtils.success(linkService.readLink(createReq!!))
+    fun postReadLink(@RequestHeader("Authorization") token: String, @RequestBody createReq: LinkDto.LinkReadOrBookmarkReqDto?): ApiResult<Long?> {
+        return ApiUtils.success(linkService.readLink(token, createReq!!))
     }
 
     @PostMapping("/bookmark")
-    fun postBookmarkLink(@RequestBody createReq: LinkDto.LinkReadOrBookmarkReqDto?): ApiResult<Long?> {
-        return ApiUtils.success(linkService.bookmarkLink(createReq!!))
+    fun postBookmarkLink(@RequestHeader("Authorization") token: String,@RequestBody createReq: LinkDto.LinkReadOrBookmarkReqDto?): ApiResult<Long?> {
+        return ApiUtils.success(linkService.bookmarkLink(token,createReq!!))
     }
 
     //개발용
@@ -46,13 +46,13 @@ class LinkController(
 
     @GetMapping
     fun getLinkList(
+        @RequestHeader("Authorization") token: String,
         @RequestParam cursorId: Long?,
         @RequestParam pageSize: Int?,
-        @RequestBody createReq: LinkDto.LinkListReqDto
     ): CursorResult<LinkDto.LinkListResDto> {
         val pageable: Pageable = PageRequest.of(0, pageSize ?: DEFAULT_SIZE, Sort.by("linkId").descending())
         val linkListPage: CursorResult<LinkDto.LinkListResDto> =
-            linkService.getLinkList(createReq, cursorId, pageable)
+            linkService.getLinkList( cursorId, pageable, token)
         return linkListPage
     }
 }
