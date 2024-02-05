@@ -26,4 +26,10 @@ class MemberDto {
         val memberAlarmSetting: AlarmDto,
         val memberBasicToken: String
     )
+
+    @Getter
+    @NoArgsConstructor
+    data class MemberBasicTokenResDto @Builder constructor(
+        val memberBasicToken: String
+    )
 }

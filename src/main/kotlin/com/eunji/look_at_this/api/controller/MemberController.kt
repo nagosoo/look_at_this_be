@@ -16,12 +16,12 @@ class MemberController(
     private val memberService: MemberService
 ) {
     @PostMapping
-    fun create(@RequestBody createReq: MemberDto.MemberReqDto): ApiUtils.ApiResult<String?> {
+    fun create(@RequestBody createReq: MemberDto.MemberReqDto): ApiUtils.ApiResult<MemberDto.MemberBasicTokenResDto?> {
         return ApiUtils.success(memberService.createMember(createReq))
     }
 
     @PostMapping("/login")
-    fun logIn(@RequestBody createReq: MemberDto.MemberReqDto): ApiUtils.ApiResult<String?> {
+    fun logIn(@RequestBody createReq: MemberDto.MemberReqDto): ApiUtils.ApiResult<MemberDto.MemberBasicTokenResDto?> {
         return ApiUtils.success(memberService.logIn(createReq))
     }
 

@@ -24,7 +24,7 @@ class MemberServiceImpl(
     private val passwordEncoder: BCryptPasswordEncoder
 ) : MemberService {
     private val log = LoggerFactory.getLogger(this.javaClass)!!
-    override fun createMember(memberReqDto: MemberDto.MemberReqDto): String? {
+    override fun createMember(memberReqDto: MemberDto.MemberReqDto): MemberDto.MemberBasicTokenResDto? {
         if (memberRepository.getMembersByMemberEmail(memberReqDto.memberEmail).isEmpty.not()) {
             log.debug("이미 존재하는 회원입니다.")
             throw FoundException("이미 존재하는 아이디야ㅠ_ㅠ")
@@ -39,10 +39,10 @@ class MemberServiceImpl(
         ).apply {
             memberRepository.save(this)
         }
-        return token
+        return MemberDto.MemberBasicTokenResDto(token)
     }
 
-    override fun logIn(memberReqDto: MemberDto.MemberReqDto): String? {
+    override fun logIn(memberReqDto: MemberDto.MemberReqDto): MemberDto.MemberBasicTokenResDto? {
         //없는 회원 일 경우
         if (memberRepository.getMembersByMemberEmail(memberReqDto.memberEmail).isEmpty) {
             throw NotFoundException("아이디 혹은 비밀번호가 틀렸어ㅠ_ㅠ")
@@ -55,7 +55,8 @@ class MemberServiceImpl(
             }
         }.get().memberPassword
 
-        return getMemberToken(memberReqDto.memberEmail, hashedPassword)
+        val token = getMemberToken(memberReqDto.memberEmail, hashedPassword)
+        return MemberDto.MemberBasicTokenResDto(token)
     }
 
     private fun getMemberToken(memberEmail: String, memberHashedPw: String): String {
