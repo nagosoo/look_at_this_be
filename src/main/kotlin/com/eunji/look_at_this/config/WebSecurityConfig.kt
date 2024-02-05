@@ -34,7 +34,7 @@ class SecurityConfig {
             .csrf().disable()
             .cors().and()
             .authorizeHttpRequests()
-            .requestMatchers("/member", "/api/v1/notification/dev", "/link/dev").permitAll()
+            .requestMatchers("/member","member/login", "/api/v1/notification/dev", "/link/dev").permitAll()
             .anyRequest().authenticated()
             .and()
             .build()

@@ -6,6 +6,7 @@ import com.eunji.look_at_this.api.entity.Member
 import com.eunji.look_at_this.api.repository.MemberRepository
 import com.eunji.look_at_this.api.service.MemberService
 import com.eunji.look_at_this.common.exception.FoundException
+import com.eunji.look_at_this.common.exception.NotFoundException
 import com.eunji.look_at_this.common.utils.DateUtil
 import com.eunji.look_at_this.common.utils.DateUtil.parseTimeToString
 import lombok.RequiredArgsConstructor
@@ -22,10 +23,10 @@ class MemberServiceImpl(
     private val passwordEncoder: BCryptPasswordEncoder
 ) : MemberService {
     private val log = LoggerFactory.getLogger(this.javaClass)!!
-    override fun createMember(memberReqDto: MemberDto.MemberReqDto): Long? {
+    override fun createMember(memberReqDto: MemberDto.MemberReqDto): String? {
         if (memberRepository.getMembersByMemberEmail(memberReqDto.memberEmail).isEmpty.not()) {
             log.debug("이미 존재하는 회원입니다.")
-            throw FoundException("이미 존재하는 회원입니다.")
+            throw FoundException("이미 존재하는 아이디야ㅠ_ㅠ")
         }
         val hashedPassword = passwordEncoder.encode(memberReqDto.memberPassword)
 
@@ -33,8 +34,29 @@ class MemberServiceImpl(
             memberPassword = hashedPassword,
             memberEmail = memberReqDto.memberEmail,
         ).apply {
-            return memberRepository.save(this).memberId
+            memberRepository.save(this)
         }
+        return getMemberToken(memberReqDto.memberEmail, hashedPassword)
+    }
+
+    override fun logIn(memberReqDto: MemberDto.MemberReqDto): String? {
+        //없는 회원 일 경우
+        if (memberRepository.getMembersByMemberEmail(memberReqDto.memberEmail).isEmpty) {
+            throw NotFoundException("아이디 혹은 비밀번호가 틀렸어ㅠ_ㅠ")
+        }
+
+        //아이디 비번 불일치
+        val hashedPassword = memberRepository.getMembersByMemberEmail(memberReqDto.memberEmail).apply {
+            if (passwordEncoder.matches(memberReqDto.memberPassword, this.get().memberPassword).not()) {
+                throw NotFoundException("아이디 혹은 비밀번호가 틀렸어ㅠ_ㅠ")
+            }
+        }.get().memberPassword
+
+        return getMemberToken(memberReqDto.memberEmail, hashedPassword)
+    }
+
+    private fun getMemberToken(memberEmail: String, memberHashedPw: String): String {
+        return java.util.Base64.getEncoder().encodeToString("$memberEmail:$memberHashedPw".toByteArray())
     }
 
     override fun getMemberList(): List<MemberDto.MemberResDto?> {
