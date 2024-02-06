@@ -89,20 +89,22 @@ class MemberServiceImpl(
         }
     }
 
-    override fun postAlarm(memberAlarmSettingPostReqDto: MemberDto.MemberAlarmSettingPostReqDto, token: String): Long? {
+    override fun postAlarm(memberAlarmSettingPostReqDto: AlarmDto, token: String): AlarmDto? {
         val memberId =TokenUtils.getMemberIdByToken(token, memberRepository)
         val member = memberRepository.findById(memberId).orElse(null) ?: return null
-        val modifiedMember = if (memberAlarmSettingPostReqDto.alarmDto.keepReceiveAlarms) {
+        val modifiedMember = if (memberAlarmSettingPostReqDto.keepReceiveAlarms) {
             member.copy(
-                keepReceiveAlarms = memberAlarmSettingPostReqDto.alarmDto.keepReceiveAlarms,
+                keepReceiveAlarms = true,
             )
         } else {
             member.copy(
-                keepReceiveAlarms = memberAlarmSettingPostReqDto.alarmDto.keepReceiveAlarms,
-                alarmTime = DateUtil.parseStringToTime(memberAlarmSettingPostReqDto.alarmDto.alarmTime!!),
+                keepReceiveAlarms = false,
+                alarmTime = DateUtil.parseStringToTime(memberAlarmSettingPostReqDto.alarmTime!!),
             )
         }
-        return memberRepository.save(modifiedMember).memberId
+
+        memberRepository.save(modifiedMember)
+        return memberAlarmSettingPostReqDto
     }
 
     override fun getAlarm(token: String): AlarmDto? {

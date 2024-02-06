@@ -13,9 +13,6 @@ class MemberDto {
     @NoArgsConstructor
     data class MemberFcmReqDto @Builder constructor(val fcmToken: String)
 
-    @NoArgsConstructor
-    data class MemberAlarmSettingPostReqDto @Builder constructor(val alarmDto: AlarmDto)
-
     @Getter
     @NoArgsConstructor
     data class MemberResDto @Builder constructor(

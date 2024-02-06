@@ -31,7 +31,7 @@ class MemberController(
     }
 
     @PostMapping("/alarm")
-    fun postAlarm(@RequestHeader("Authorization") token: String, @RequestBody postAlarmReqDto: MemberDto.MemberAlarmSettingPostReqDto): ApiUtils.ApiResult<Long?> {
+    fun postAlarm(@RequestHeader("Authorization") token: String, @RequestBody postAlarmReqDto:AlarmDto): ApiUtils.ApiResult<AlarmDto?> {
         return ApiUtils.success(memberService.postAlarm(postAlarmReqDto,token))
     }
 

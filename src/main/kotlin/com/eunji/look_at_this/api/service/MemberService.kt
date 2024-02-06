@@ -8,6 +8,6 @@ interface MemberService {
     fun logIn(memberReqDto: MemberDto.MemberReqDto): MemberDto.MemberBasicTokenResDto?
     fun getMemberList(): List<MemberDto.MemberResDto?>
     fun postFcmToken(memberFcmReqDto: MemberDto.MemberFcmReqDto, token: String): Long?
-    fun postAlarm(memberAlarmSettingPostReqDto: MemberDto.MemberAlarmSettingPostReqDto, token: String): Long?
+    fun postAlarm(memberAlarmSettingPostReqDto: AlarmDto, token: String): AlarmDto?
     fun getAlarm(token:String): AlarmDto?
 }
