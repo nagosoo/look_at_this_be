@@ -26,7 +26,7 @@ class MemberController(
     }
 
     @PostMapping("/fcm")
-    fun postFcmToken(@RequestHeader("Authorization") token: String, @RequestBody createReq: MemberDto.MemberFcmReqDto): ApiUtils.ApiResult<Long?> {
+    fun postFcmToken(@RequestHeader("Authorization") token: String, @RequestBody createReq: MemberDto.MemberFcmReqDto): ApiUtils.ApiResult<Boolean?> {
         return ApiUtils.success(memberService.postFcmToken(createReq, token))
     }
 

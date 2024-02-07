@@ -79,13 +79,13 @@ class MemberServiceImpl(
         }
     }
 
-    override fun postFcmToken(memberFcmReqDto: MemberDto.MemberFcmReqDto, token: String): Long? {
+    override fun postFcmToken(memberFcmReqDto: MemberDto.MemberFcmReqDto, token: String): Boolean? {
         val memberId =TokenUtils.getMemberIdByToken(token, memberRepository)
         val member = memberRepository.findById(memberId).orElse(null) ?: return null
         member.copy(
             memberFcmToken = memberFcmReqDto.fcmToken
         ).apply {
-            return memberRepository.save(this).memberId
+            return true
         }
     }
 
