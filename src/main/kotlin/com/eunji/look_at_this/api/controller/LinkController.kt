@@ -3,6 +3,7 @@ package com.eunji.look_at_this.api.controller
 import com.eunji.look_at_this.api.dto.CursorResult
 import com.eunji.look_at_this.api.dto.LinkDto
 import com.eunji.look_at_this.api.dto.LinkDto.LinkReqDto
+import com.eunji.look_at_this.api.entity.Link
 import com.eunji.look_at_this.api.service.LinkService
 import com.eunji.look_at_this.common.utils.ApiUtils
 import com.eunji.look_at_this.common.utils.ApiUtils.ApiResult
@@ -22,7 +23,7 @@ class LinkController(
     private val linkService: LinkService
 ) {
     @PostMapping
-    fun create(@RequestHeader("Authorization") token: String, @RequestBody createReq: LinkReqDto?): ApiResult<Long?> {
+    fun create(@RequestHeader("Authorization") token: String, @RequestBody createReq: LinkReqDto?): ApiResult<LinkDto.LinkListResDto?> {
         return ApiUtils.success(linkService.createLink(createReq!!, token))
     }
 

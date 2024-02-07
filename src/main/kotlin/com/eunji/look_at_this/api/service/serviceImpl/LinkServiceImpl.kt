@@ -52,7 +52,7 @@ class LinkServiceImpl(
         }
     }
 
-    override fun createLink(linkReqDto: LinkDto.LinkReqDto, token: String): Long? {
+    override fun createLink(linkReqDto: LinkDto.LinkReqDto, token: String): LinkDto.LinkListResDto? {
         Link(
             linkUrl = linkReqDto.linkUrl,
             linkMemo = linkReqDto.linkMemo,
@@ -61,7 +61,16 @@ class LinkServiceImpl(
         ).apply {
             postFcm()
             readLink(token, LinkDto.LinkReadOrBookmarkReqDto(linkRepository.save(this).linkId))
-            return linkRepository.save(this).linkId
+            linkRepository.save(this)
+            return LinkDto.LinkListResDto(
+                linkId = this.linkId,
+                linkUrl = this.linkUrl,
+                linkMemo = this.linkMemo,
+                linkThumbnail = this.linkThumbnail,
+                linkCreatedAt = this.linkCreatedAt.toString(),
+                linkIsRead = true,
+                linkIsBookmark = false,
+            )
         }
     }
 
@@ -129,7 +138,7 @@ class LinkServiceImpl(
         val allLinks: List<Link> = getLinks(cursorId, pageSize)
         val lastIdOfList: Long? = if (allLinks.isEmpty()) null else allLinks.last().linkId
 
-        val memberId =TokenUtils.getMemberIdByToken(token, memberRepository)
+        val memberId = TokenUtils.getMemberIdByToken(token, memberRepository)
 
         val readLinks = linkClickHistoryRepository.findAll().filter {
             it.member?.memberId == memberId
@@ -160,7 +169,7 @@ class LinkServiceImpl(
 
     override fun bookmarkLink(token: String, linkReadOrBookmarkReqDto: LinkDto.LinkReadOrBookmarkReqDto): Long? {
         val link: Link = linkRepository.findById(linkReadOrBookmarkReqDto.linkId).get()
-        val memberId =TokenUtils.getMemberIdByToken(token, memberRepository)
+        val memberId = TokenUtils.getMemberIdByToken(token, memberRepository)
         val member: Member = memberRepository.findById(memberId).get()
         val linkBookmarkHistory = bookmarkHistoryRepository.findByMemberAndLink(member, link)
         if (linkBookmarkHistory == null) {
