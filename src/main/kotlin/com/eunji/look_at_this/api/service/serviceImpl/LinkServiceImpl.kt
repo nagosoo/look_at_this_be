@@ -47,7 +47,11 @@ class LinkServiceImpl(
     }
 
     private fun getThumbnail(linkUrl: String): String {
-        Jsoup.connect(linkUrl).get().run {
+        var absoluteUrl = linkUrl
+        if (!linkUrl.contains("http") && !linkUrl.contains("https")) {
+            absoluteUrl = "https://$linkUrl"
+        }
+        Jsoup.connect(absoluteUrl).get().run {
             return this.select("meta[property=og:image]").attr("content")
         }
     }

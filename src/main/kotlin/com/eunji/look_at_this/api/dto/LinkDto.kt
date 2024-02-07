@@ -9,7 +9,7 @@ class LinkDto {
     //링크 생성 요청
     @Getter
     @NoArgsConstructor
-    class LinkReqDto @Builder constructor(var linkUrl: String, var linkMemo: String) {
+    class LinkReqDto @Builder constructor(var linkUrl: String, var linkMemo: String?) {
     }
 
     //링크 조회 응답 - dev
@@ -18,8 +18,8 @@ class LinkDto {
     class LinkResDtoDev @Builder constructor(
         var linkId: Long,
         var linkUrl: String,
-        var linkMemo: String,
-        var linkThumbnail: String,
+        var linkMemo: String?,
+        var linkThumbnail: String?,
         var linkCreatedAt: String,
     ) {
 
@@ -31,11 +31,11 @@ class LinkDto {
     class LinkListResDto @Builder constructor(
         var linkId: Long,
         var linkUrl: String,
-        var linkMemo: String,
-        var linkThumbnail: String,
+        var linkMemo: String?,
+        var linkThumbnail: String?,
         var linkCreatedAt: String,
-        var linkIsRead : Boolean  = false,
-        var linkIsBookmark : Boolean = false,
+        var linkIsRead: Boolean = false,
+        var linkIsBookmark: Boolean = false,
     ) {
 
     }
