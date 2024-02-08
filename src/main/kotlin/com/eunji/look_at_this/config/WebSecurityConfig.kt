@@ -53,7 +53,7 @@ class SecurityConfig {
             .password(bCryptPasswordEncoder.encode("\$2a\$10\$k3qKC1RNQSqU.1UWbj.P8eLLoO/aiMvmtdFloZJoXl326pOdpe97e"))
             .roles("USER")
             .build()
-        return InMemoryUserDetailsManager(userDebug)
+        return InMemoryUserDetailsManager(userDebug,userRelease)
     }
 
 
