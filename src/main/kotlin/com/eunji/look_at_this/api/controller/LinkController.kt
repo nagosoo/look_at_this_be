@@ -28,12 +28,12 @@ class LinkController(
     }
 
     @PostMapping("/read")
-    fun postReadLink(@RequestHeader("Authorization") token: String, @RequestBody createReq: LinkDto.LinkReadOrBookmarkReqDto?): ApiResult<Long?> {
+    fun postReadLink(@RequestHeader("Authorization") token: String, @RequestBody createReq: LinkDto.LinkReadOrBookmarkReqDto?): ApiResult<LinkDto.LinkListResDto?> {
         return ApiUtils.success(linkService.readLink(token, createReq!!))
     }
 
     @PostMapping("/bookmark")
-    fun postBookmarkLink(@RequestHeader("Authorization") token: String,@RequestBody createReq: LinkDto.LinkReadOrBookmarkReqDto?): ApiResult<Long?> {
+    fun postBookmarkLink(@RequestHeader("Authorization") token: String,@RequestBody createReq: LinkDto.LinkReadOrBookmarkReqDto?): ApiResult<LinkDto.LinkListResDto?> {
         return ApiUtils.success(linkService.bookmarkLink(token,createReq!!))
     }
 
