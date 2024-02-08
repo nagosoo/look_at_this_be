@@ -55,6 +55,4 @@ class SecurityConfig {
             .build()
         return InMemoryUserDetailsManager(userDebug,userRelease)
     }
-
-
 }
