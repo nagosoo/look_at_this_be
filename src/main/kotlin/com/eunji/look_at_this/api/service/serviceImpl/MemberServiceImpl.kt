@@ -85,6 +85,7 @@ class MemberServiceImpl(
         member.copy(
             memberFcmToken = memberFcmReqDto.fcmToken
         ).apply {
+            memberRepository.save(this)
             return true
         }
     }
