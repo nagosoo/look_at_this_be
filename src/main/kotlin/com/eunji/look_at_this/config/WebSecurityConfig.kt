@@ -43,12 +43,17 @@ class SecurityConfig {
     @Bean
     fun userDetailsService(bCryptPasswordEncoder: BCryptPasswordEncoder): UserDetailsService {
         val users: User.UserBuilder = User.builder()
-        val user: UserDetails = users
+        val userDebug: UserDetails = users
             .username("nagosoo2")
             .password(bCryptPasswordEncoder.encode("\$2a\$10\$pExdAHEOR3LCpODWZYooX.lBNBvJ41XzRlApnqm1eQttDXIeEBPM6"))
             .roles("USER")
             .build()
-        return InMemoryUserDetailsManager(user)
+        val userRelease: UserDetails = users
+            .username("nagosoo")
+            .password(bCryptPasswordEncoder.encode("\$2a\$10\$k3qKC1RNQSqU.1UWbj.P8eLLoO/aiMvmtdFloZJoXl326pOdpe97e"))
+            .roles("USER")
+            .build()
+        return InMemoryUserDetailsManager(userDebug)
     }
 
 
