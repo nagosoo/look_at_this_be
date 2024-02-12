@@ -13,6 +13,7 @@ import com.eunji.look_at_this.api.repository.LinkRepository
 import com.eunji.look_at_this.api.repository.MemberRepository
 import com.eunji.look_at_this.api.service.FCMNotificationService
 import com.eunji.look_at_this.api.service.LinkService
+import com.eunji.look_at_this.common.exception.NotUrlFormatException
 import com.eunji.look_at_this.common.utils.TokenUtils
 import lombok.RequiredArgsConstructor
 import lombok.extern.slf4j.Slf4j
@@ -48,11 +49,15 @@ class LinkServiceImpl(
 
     private fun getThumbnail(linkUrl: String): String {
         var absoluteUrl = linkUrl
-        if (!linkUrl.contains("http") && !linkUrl.contains("https")) {
+        if (!linkUrl.startsWith("http") && !linkUrl.startsWith("https")) {
             absoluteUrl = "https://$linkUrl"
         }
-        Jsoup.connect(absoluteUrl).get().run {
-            return this.select("meta[property=og:image]").attr("content")
+        try {
+            Jsoup.connect(absoluteUrl).get().run {
+                return this.select("meta[property=og:image]").attr("content")
+            }
+        } catch (e: Exception) {
+            throw NotUrlFormatException("유효한 링크가 아니야ㅠ_ㅠ")
         }
     }
 
@@ -96,7 +101,10 @@ class LinkServiceImpl(
         }
     }
 
-    override fun readLink(token: String, linkReadOrBookmarkReqDto: LinkDto.LinkReadOrBookmarkReqDto): LinkDto.LinkListResDto? {
+    override fun readLink(
+        token: String,
+        linkReadOrBookmarkReqDto: LinkDto.LinkReadOrBookmarkReqDto
+    ): LinkDto.LinkListResDto? {
         val link: Link = linkRepository.findById(linkReadOrBookmarkReqDto.linkId).get()
         val memberId = TokenUtils.getMemberIdByToken(token, memberRepository)
         val member: Member = memberRepository.findById(memberId).get()
@@ -107,7 +115,7 @@ class LinkServiceImpl(
                 member = member,
                 link = link,
             ).apply {
-                 linkClickHistoryRepository.save(this)
+                linkClickHistoryRepository.save(this)
             }
         }
         return LinkDto.LinkListResDto(
@@ -177,7 +185,10 @@ class LinkServiceImpl(
         return CursorResult<LinkDto.LinkListResDto>(linksRes, hasNext(lastIdOfList), getNextCursorId(lastIdOfList))
     }
 
-    override fun bookmarkLink(token: String, linkReadOrBookmarkReqDto: LinkDto.LinkReadOrBookmarkReqDto): LinkDto.LinkListResDto? {
+    override fun bookmarkLink(
+        token: String,
+        linkReadOrBookmarkReqDto: LinkDto.LinkReadOrBookmarkReqDto
+    ): LinkDto.LinkListResDto? {
         val link: Link = linkRepository.findById(linkReadOrBookmarkReqDto.linkId).get()
         val memberId = TokenUtils.getMemberIdByToken(token, memberRepository)
         val member: Member = memberRepository.findById(memberId).get()
@@ -188,7 +199,7 @@ class LinkServiceImpl(
                 member = member,
                 link = link,
             ).apply {
-                 bookmarkHistoryRepository.save(this)
+                bookmarkHistoryRepository.save(this)
             }
         } else {
             //북마크 해지

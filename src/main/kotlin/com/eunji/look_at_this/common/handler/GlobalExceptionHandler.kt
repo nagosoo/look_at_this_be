@@ -2,6 +2,7 @@ package com.eunji.look_at_this.common.handler
 
 import com.eunji.look_at_this.common.exception.FoundException
 import com.eunji.look_at_this.common.exception.NotFoundException
+import com.eunji.look_at_this.common.exception.NotUrlFormatException
 import com.eunji.look_at_this.common.utils.ApiUtils
 import com.eunji.look_at_this.common.utils.ApiUtils.ApiResult
 import lombok.extern.slf4j.Slf4j
@@ -27,6 +28,13 @@ class GlobalExceptionHandler {
     )
     fun handleNotFoundException(e: NotFoundException): ResponseEntity<ApiResult<*>> {
         return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(ApiUtils.error("아이디 혹은 비밀번호가 틀렸어ㅠ_ㅠ"))
+    }
+
+    @ExceptionHandler(
+        value = [NotUrlFormatException::class]
+    )
+    fun handleNotUrlFormatException(e: NotUrlFormatException): ResponseEntity<ApiResult<*>> {
+        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(ApiUtils.error("유효한 링크가 아니야ㅠ_ㅠ"))
     }
 
 }
