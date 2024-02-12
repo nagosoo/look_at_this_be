@@ -48,12 +48,8 @@ class LinkServiceImpl(
     }
 
     private fun getThumbnail(linkUrl: String): String {
-        var absoluteUrl = linkUrl
-        if (!linkUrl.startsWith("http") && !linkUrl.startsWith("https")) {
-            absoluteUrl = "https://$linkUrl"
-        }
         try {
-            Jsoup.connect(absoluteUrl).get().run {
+            Jsoup.connect(linkUrl).get().run {
                 return this.select("meta[property=og:image]").attr("content")
             }
         } catch (e: Exception) {
@@ -62,10 +58,14 @@ class LinkServiceImpl(
     }
 
     override fun createLink(linkReqDto: LinkDto.LinkReqDto, token: String): LinkDto.LinkListResDto? {
+        var absoluteUrl = linkReqDto.linkUrl
+        if (!linkReqDto.linkUrl.startsWith("http") && !linkReqDto.linkUrl.startsWith("https")) {
+            absoluteUrl = "https://${linkReqDto.linkUrl}"
+        }
         Link(
-            linkUrl = linkReqDto.linkUrl,
+            linkUrl = absoluteUrl,
             linkMemo = linkReqDto.linkMemo,
-            linkThumbnail = getThumbnail(linkReqDto.linkUrl),
+            linkThumbnail = getThumbnail(absoluteUrl),
             linkCreatedAt = LocalDateTime.now()
         ).apply {
             postFcm()
