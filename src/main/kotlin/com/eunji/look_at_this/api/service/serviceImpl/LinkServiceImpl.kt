@@ -89,7 +89,7 @@ class LinkServiceImpl(
                     FcmDto.FCMNotificationRequestDto(
                         fcmToken = fcmToken,
                         title = "ㅇㅣㄱㅓ보ㅏ보ㅏ",
-                        body = "새로운 링크가 도착했오!",
+                        body = "새로운 링크가 도착했오!꼬옥 봐주는구야🧡",
                     )
                 )
             }
