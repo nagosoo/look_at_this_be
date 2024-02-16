@@ -185,6 +185,47 @@ class LinkServiceImpl(
         return CursorResult<LinkDto.LinkListResDto>(linksRes, hasNext(lastIdOfList), getNextCursorId(lastIdOfList))
     }
 
+    override fun getBookmarkLinkList(
+        cursorId: Long?,
+        pageSize: Pageable,
+        token: String
+    ): CursorResult<LinkDto.LinkListResDto> {
+
+        val memberId = TokenUtils.getMemberIdByToken(token, memberRepository)
+        val allLinks: List<Link> = getLinks(cursorId, pageSize)
+        val bookmarkLinks : List<Link> = allLinks.filter {
+            it.bookMarkHistories.any { it.member?.memberId == memberId }
+        }
+        val lastIdOfList: Long? = if (bookmarkLinks.isEmpty()) null else bookmarkLinks.last().linkId
+
+
+        val readLinks = linkClickHistoryRepository.findAll().filter {
+            it.member?.memberId == memberId
+        }.map {
+            it.link?.linkId
+        }
+
+        val bookmarkedLinks = bookmarkHistoryRepository.findAll().filter {
+            it.member?.memberId == memberId
+        }.map {
+            it.link?.linkId
+        }
+
+        val linksRes = bookmarkLinks.map {
+            LinkDto.LinkListResDto(
+                linkId = it.linkId,
+                linkUrl = it.linkUrl,
+                linkMemo = it.linkMemo,
+                linkThumbnail = it.linkThumbnail,
+                linkCreatedAt = it.linkCreatedAt.toString(),
+                linkIsRead = readLinks.contains(it.linkId),
+                linkIsBookmark = bookmarkedLinks.contains(it.linkId),
+            )
+        }
+
+        return CursorResult<LinkDto.LinkListResDto>(linksRes, hasNext(lastIdOfList), getNextCursorId(lastIdOfList))
+    }
+
     override fun bookmarkLink(
         token: String,
         linkReadOrBookmarkReqDto: LinkDto.LinkReadOrBookmarkReqDto

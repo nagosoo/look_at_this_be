@@ -12,4 +12,5 @@ interface LinkService {
         fun readLink(token: String, linkReadOrBookmarkReqDto: LinkDto.LinkReadOrBookmarkReqDto): LinkDto.LinkListResDto?
         fun bookmarkLink(token: String, linkReadOrBookmarkReqDto: LinkDto.LinkReadOrBookmarkReqDto): LinkDto.LinkListResDto?
         fun getLinkList(cursorId: Long?, pageSize: Pageable, token: String):CursorResult<LinkDto.LinkListResDto>
+        fun getBookmarkLinkList(cursorId: Long?, pageSize: Pageable, token: String):CursorResult<LinkDto.LinkListResDto>
 }

@@ -56,4 +56,16 @@ class LinkController(
             linkService.getLinkList( cursorId, pageable, token)
         return linkListPage
     }
+
+    @GetMapping("/bookmark")
+    fun getBookmarkLinkList(
+        @RequestHeader("Authorization") token: String,
+        @RequestParam cursorId: Long?,
+        @RequestParam pageSize: Int?,
+    ): CursorResult<LinkDto.LinkListResDto> {
+        val pageable: Pageable = PageRequest.of(0, pageSize ?: DEFAULT_SIZE, Sort.by("linkId").descending())
+        val linkListPage: CursorResult<LinkDto.LinkListResDto> =
+            linkService.getBookmarkLinkList( cursorId, pageable, token)
+        return linkListPage
+    }
 }
