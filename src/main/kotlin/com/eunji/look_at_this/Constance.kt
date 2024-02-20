@@ -8,5 +8,6 @@ object Constance {
     const val ALREADY_EXIST_MEMBER_ERROR = "이미 존재하는 아이디야ㅠ_ㅠ"
     const val NOT_URL_FORMAT_ERROR = "유효한 링크가 아니야ㅠ_ㅠ"
     const val DEFAULT_PAGING_SIZE = 10
+    const val CHANNEL_ID = "NORMAL_CHANNEL"
 
 }

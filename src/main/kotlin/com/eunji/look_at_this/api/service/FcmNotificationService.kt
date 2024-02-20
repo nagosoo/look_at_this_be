@@ -1,5 +1,6 @@
 package com.eunji.look_at_this.api.service
 
+import com.eunji.look_at_this.Constance.CHANNEL_ID
 import com.eunji.look_at_this.api.dto.FcmDto
 import com.eunji.look_at_this.api.repository.MemberRepository
 import com.google.firebase.messaging.*
@@ -33,7 +34,7 @@ class FCMNotificationService(
                     .setPriority(AndroidConfig.Priority.HIGH)
                     .setNotification(
                         AndroidNotification.builder()
-                            .setChannelId("CHANNEL_ID")
+                            .setChannelId(CHANNEL_ID)
                             .build()
                     )
                     .build()
@@ -73,7 +74,7 @@ class FCMNotificationService(
                         .setPriority(AndroidConfig.Priority.HIGH)
                         .setNotification(
                             AndroidNotification.builder()
-                                .setChannelId("CHANNEL_ID")
+                                .setChannelId(CHANNEL_ID)
                                 .build()
                         )
                         .build()
