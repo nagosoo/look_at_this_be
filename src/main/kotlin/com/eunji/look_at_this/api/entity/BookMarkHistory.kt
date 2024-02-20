@@ -15,12 +15,12 @@ data class BookMarkHistory(
 
     @ManyToOne
     @JoinColumn(name = "member_id")
-    val member: Member? = null,
+    override val member: Member? = null,
 
     @ManyToOne
     @JoinColumn(name = "link_id")
-    val link: Link? = null,
-) {
+    override val link: Link? = null,
+) : LinkHistory {
     @Builder
     constructor(
         member: Member,

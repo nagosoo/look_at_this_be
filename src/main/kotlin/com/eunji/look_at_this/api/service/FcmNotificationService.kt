@@ -15,53 +15,59 @@ class FCMNotificationService(
     private val memberRepository: MemberRepository,
 ) {
 
-    fun sendNotificationByUserToken(requestDto: FcmDto.FCMNotificationRequestDto): String {
+    /*
+       * FcmToken을 통해 특정 사용자에게 알림을 보냄
+       * */
+    fun sendNotification(requestDto: FcmDto.FCMNotificationRequestDto): String {
 
-            val notification: Notification = Notification.builder()
-                .setTitle(requestDto.title)
-                .setBody(requestDto.body) // .setImage(requestDto.getImage())
-                .build()
+        val notification: Notification = Notification.builder()
+            .setTitle(requestDto.title)
+            .setBody(requestDto.body)
+            .build()
 
-            val message: Message = Message.builder()
-                .setToken(requestDto.fcmToken)
-                .setNotification(notification) // .putAllData(requestDto.getData())
-                .setAndroidConfig(
-                    AndroidConfig.builder()
-                        .setPriority(AndroidConfig.Priority.HIGH)
-                        .setNotification(
-                            AndroidNotification.builder()
-                                .setChannelId("CHANNEL_ID")
-                                .build()
-                        )
-                        .build()
-                )
-                .build()
+        val message: Message = Message.builder()
+            .setToken(requestDto.fcmToken)
+            .setNotification(notification)
+            .setAndroidConfig(
+                AndroidConfig.builder()
+                    .setPriority(AndroidConfig.Priority.HIGH)
+                    .setNotification(
+                        AndroidNotification.builder()
+                            .setChannelId("CHANNEL_ID")
+                            .build()
+                    )
+                    .build()
+            )
+            .build()
 
-            try {
-                firebaseMessaging.send(message)
-                return "알림을 성공적으로 전송했습니다. targetUserId=" + requestDto.fcmToken
-            } catch (e: FirebaseMessagingException) {
-                e.printStackTrace()
-                return "알림 보내기를 실패하였습니다. targetUserId=" + requestDto.fcmToken
-            }
+        try {
+            firebaseMessaging.send(message)
+            return "알림을 성공적으로 전송했습니다. targetUserId=" + requestDto.fcmToken
+        } catch (e: FirebaseMessagingException) {
+            e.printStackTrace()
+            return "알림 보내기를 실패하였습니다. targetUserId=" + requestDto.fcmToken
+        }
 
     }
 
-    fun sendNotificationByUserId(requestDto: FcmDto.FCMNotificationRequestDtoDev): String {
+    /*
+    * 개발용) MemberId 를 통해 특정 사용자에게 알림을 보냄
+    * */
+    fun sendNotificationForDev(requestDto: FcmDto.FCMNotificationRequestDtoDev): String {
 
         val member = memberRepository.findById(requestDto.targetUserId)
 
         if (!member.isEmpty) {
             val notification: Notification = Notification.builder()
                 .setTitle(requestDto.title)
-                .setBody(requestDto.body) // .setImage(requestDto.getImage())
+                .setBody(requestDto.body)
                 .build()
 
             val fcmToken = member.get().memberFcmToken
 
             val message: Message = Message.builder()
                 .setToken(fcmToken)
-                .setNotification(notification) // .putAllData(requestDto.getData())
+                .setNotification(notification)
                 .setAndroidConfig(
                     AndroidConfig.builder()
                         .setPriority(AndroidConfig.Priority.HIGH)

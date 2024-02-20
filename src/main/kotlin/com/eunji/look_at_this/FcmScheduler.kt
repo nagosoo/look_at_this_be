@@ -44,11 +44,11 @@ class FcmScheduler(
             it.memberFcmToken
         }.forEach { fcmToken ->
             fcmToken?.let {
-                fcmNotificationService.sendNotificationByUserToken(
+                fcmNotificationService.sendNotification(
                     FcmDto.FCMNotificationRequestDto(
                         fcmToken = fcmToken,
-                        title = "ㅇㅣㄱㅓ보ㅏ보ㅏ",
-                        body = "새로운 링크가 도착했오!꼬옥 봐주는구야🧡",
+                        title = Constance.FCM_TITLE,
+                        body = Constance.FCM_BODY,
                     )
                 )
             }

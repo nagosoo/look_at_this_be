@@ -1,5 +1,6 @@
 package com.eunji.look_at_this.config
 
+import com.eunji.look_at_this.Constance
 import com.eunji.look_at_this.api.entity.Member
 import com.eunji.look_at_this.api.repository.MemberRepository
 import com.eunji.look_at_this.common.exception.NotFoundException
@@ -33,8 +34,7 @@ class WebSecurityConfig {
 @Configuration
 @EnableWebSecurity
 @RequiredArgsConstructor
-class SecurityConfig(
-) {
+class SecurityConfig {
     @Bean
     @Throws(Exception::class)
     fun securityFilterChain(httpSecurity: HttpSecurity): SecurityFilterChain {
@@ -74,16 +74,14 @@ class PrincipalDetailService : UserDetailsService {
 
     @Throws(NotFoundException::class)
     override fun loadUserByUsername(email: String): UserDetails {
-        val opt: Optional<Member> = userRepo.findByMemberEmail(email)
-
-        return opt.map { user ->
-            val authorities: MutableCollection<GrantedAuthority> = ArrayList()
-            authorities.add(GrantedAuthority { "ROLE_USER" })
-            User(
-                user.memberEmail,
-                passwordEncoder.encode(user.memberPassword),
-                authorities
-            )
-        }.orElseThrow { NotFoundException("아이디 혹은 비밀번호가 틀렸어ㅠ_ㅠ") }
+        val member: Member =
+            userRepo.findByMemberEmail(email) ?: throw NotFoundException(Constance.NOT_FOUND_MEMBER_ERROR)
+        val authorities: MutableCollection<GrantedAuthority> = ArrayList()
+        authorities.add(GrantedAuthority { "ROLE_USER" })
+        return User(
+            member.memberEmail,
+            passwordEncoder.encode(member.memberPassword),
+            authorities
+        )
     }
 }

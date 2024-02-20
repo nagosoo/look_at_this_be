@@ -20,10 +20,10 @@ class FCMNotificationApiController(
 
     @PostMapping("/dev")
     fun sendNotificationByUserId(@RequestBody requestDto: FcmDto.FCMNotificationRequestDtoDev): String {
-        return fcmNotificationService.sendNotificationByUserId(requestDto)
+        return fcmNotificationService.sendNotificationForDev(requestDto)
     }
     @PostMapping
     fun sendNotificationByToken(@RequestBody requestDto: FcmDto.FCMNotificationRequestDto): String {
-        return fcmNotificationService.sendNotificationByUserToken(requestDto)
+        return fcmNotificationService.sendNotification(requestDto)
     }
 }

@@ -1,5 +1,6 @@
 package com.eunji.look_at_this.api.service.serviceImpl
 
+import com.eunji.look_at_this.Constance
 import com.eunji.look_at_this.api.dto.AlarmDto
 import com.eunji.look_at_this.api.dto.MemberDto
 import com.eunji.look_at_this.api.entity.Member
@@ -9,10 +10,9 @@ import com.eunji.look_at_this.common.exception.FoundException
 import com.eunji.look_at_this.common.exception.NotFoundException
 import com.eunji.look_at_this.common.utils.DateUtil
 import com.eunji.look_at_this.common.utils.DateUtil.parseTimeToString
-import com.eunji.look_at_this.common.utils.TokenUtils
+import com.eunji.look_at_this.common.utils.TokenUtil
 import lombok.RequiredArgsConstructor
 import lombok.extern.slf4j.Slf4j
-import org.slf4j.LoggerFactory
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder
 import org.springframework.stereotype.Service
 
@@ -23,14 +23,12 @@ class MemberServiceImpl(
     private val memberRepository: MemberRepository,
     private val passwordEncoder: BCryptPasswordEncoder
 ) : MemberService {
-    private val log = LoggerFactory.getLogger(this.javaClass)!!
-    override fun createMember(memberReqDto: MemberDto.MemberReqDto): MemberDto.MemberBasicTokenResDto? {
-        if (memberRepository.getMembersByMemberEmail(memberReqDto.memberEmail).isEmpty.not()) {
-            log.debug("이미 존재하는 회원입니다.")
-            throw FoundException("이미 존재하는 아이디야ㅠ_ㅠ")
+    override fun signUp(memberReqDto: MemberDto.MemberReqDto): MemberDto.MemberBasicTokenResDto? {
+        if (memberRepository.findByMemberEmail(memberReqDto.memberEmail) != null) {
+            throw FoundException(Constance.ALREADY_EXIST_MEMBER_ERROR)
         }
         val hashedPassword = passwordEncoder.encode(memberReqDto.memberPassword)
-        val token = getMemberToken(memberReqDto.memberEmail, hashedPassword)
+        val token = getBasicToken(memberReqDto.memberEmail, hashedPassword)
 
         Member(
             memberBasicToken = token,
@@ -42,28 +40,21 @@ class MemberServiceImpl(
         return MemberDto.MemberBasicTokenResDto(token)
     }
 
-    override fun logIn(memberReqDto: MemberDto.MemberReqDto): MemberDto.MemberBasicTokenResDto? {
-        //없는 회원 일 경우
-        if (memberRepository.getMembersByMemberEmail(memberReqDto.memberEmail).isEmpty) {
-            throw NotFoundException("아이디 혹은 비밀번호가 틀렸어ㅠ_ㅠ")
-        }
+    override fun signIn(memberReqDto: MemberDto.MemberReqDto): MemberDto.MemberBasicTokenResDto? {
+        val member = memberRepository.findByMemberEmail(memberReqDto.memberEmail)
+            ?: throw NotFoundException(Constance.NOT_FOUND_MEMBER_ERROR) //없는 회원 일 경우
 
         //아이디 비번 불일치
-        val hashedPassword = memberRepository.getMembersByMemberEmail(memberReqDto.memberEmail).apply {
-            if (passwordEncoder.matches(memberReqDto.memberPassword, this.get().memberPassword).not()) {
-                throw NotFoundException("아이디 혹은 비밀번호가 틀렸어ㅠ_ㅠ")
-            }
-        }.get().memberPassword
+        if (passwordEncoder.matches(memberReqDto.memberPassword, member.memberPassword).not()) {
+            throw NotFoundException(Constance.NOT_FOUND_MEMBER_ERROR)
+        }
 
-        val token = getMemberToken(memberReqDto.memberEmail, hashedPassword)
+        val token = getBasicToken(memberReqDto.memberEmail, member.memberPassword)
         return MemberDto.MemberBasicTokenResDto(token)
     }
 
-    private fun getMemberToken(memberEmail: String, memberHashedPw: String): String {
-        return java.util.Base64.getEncoder().encodeToString("$memberEmail:$memberHashedPw".toByteArray())
-    }
-
-    override fun getMemberList(): List<MemberDto.MemberResDto?> {
+    //개발용
+    override fun getMembers(): List<MemberDto.MemberResDto?> {
         return memberRepository.findAll().map {
             MemberDto.MemberResDto(
                 memberId = it.memberId,
@@ -79,41 +70,42 @@ class MemberServiceImpl(
         }
     }
 
-    override fun postFcmToken(memberFcmReqDto: MemberDto.MemberFcmReqDto, token: String): Boolean? {
-        val memberId =TokenUtils.getMemberIdByToken(token, memberRepository)
-        val member = memberRepository.findById(memberId).orElse(null) ?: return null
+    override fun postFcmToken(fcmReqDto: MemberDto.MemberFcmReqDto, token: String): Boolean? {
+        val member = TokenUtil.getMemberByToken(token, memberRepository) ?: return null
         member.copy(
-            memberFcmToken = memberFcmReqDto.fcmToken
+            memberFcmToken = fcmReqDto.fcmToken
         ).apply {
             memberRepository.save(this)
             return true
         }
     }
 
-    override fun postAlarm(memberAlarmSettingPostReqDto: AlarmDto, token: String): AlarmDto? {
-        val memberId =TokenUtils.getMemberIdByToken(token, memberRepository)
-        val member = memberRepository.findById(memberId).orElse(null) ?: return null
-        val modifiedMember = if (memberAlarmSettingPostReqDto.keepReceiveAlarms) {
+    override fun postAlarm(alarmReqDto: AlarmDto, token: String): AlarmDto? {
+        val member = TokenUtil.getMemberByToken(token, memberRepository) ?: return null
+        val modifiedMember = if (alarmReqDto.keepReceiveAlarms) {
             member.copy(
                 keepReceiveAlarms = true,
             )
         } else {
             member.copy(
                 keepReceiveAlarms = false,
-                alarmTime = DateUtil.parseStringToTime(memberAlarmSettingPostReqDto.alarmTime!!),
+                alarmTime = DateUtil.parseStringToTime(alarmReqDto.alarmTime!!),
             )
         }
 
         memberRepository.save(modifiedMember)
-        return memberAlarmSettingPostReqDto
+        return alarmReqDto
     }
 
     override fun getAlarm(token: String): AlarmDto? {
-        val memberId =TokenUtils.getMemberIdByToken(token, memberRepository)
-        val member = memberRepository.findById(memberId).orElse(null) ?: return null
+        val member = TokenUtil.getMemberByToken(token, memberRepository) ?: return null
         return AlarmDto(
             keepReceiveAlarms = member.keepReceiveAlarms,
             alarmTime = parseTimeToString(member.alarmTime)
         )
+    }
+
+    private fun getBasicToken(email: String, hashedPw: String): String {
+        return java.util.Base64.getEncoder().encodeToString("$email:$hashedPw".toByteArray())
     }
 }

@@ -3,7 +3,7 @@ package com.eunji.look_at_this.api.controller
 import com.eunji.look_at_this.api.dto.AlarmDto
 import com.eunji.look_at_this.api.dto.MemberDto
 import com.eunji.look_at_this.api.service.MemberService
-import com.eunji.look_at_this.common.utils.ApiUtils
+import com.eunji.look_at_this.common.utils.ApiUtil
 import lombok.RequiredArgsConstructor
 import lombok.extern.slf4j.Slf4j
 import org.springframework.web.bind.annotation.*
@@ -16,32 +16,39 @@ class MemberController(
     private val memberService: MemberService
 ) {
     @PostMapping
-    fun create(@RequestBody createReq: MemberDto.MemberReqDto): ApiUtils.ApiResult<MemberDto.MemberBasicTokenResDto?> {
-        return ApiUtils.success(memberService.createMember(createReq))
+    fun signUp(@RequestBody memberDto: MemberDto.MemberReqDto): ApiUtil.ApiResult<MemberDto.MemberBasicTokenResDto?> {
+        return ApiUtil.success(memberService.signUp(memberDto))
     }
 
     @PostMapping("/login")
-    fun logIn(@RequestBody createReq: MemberDto.MemberReqDto): ApiUtils.ApiResult<MemberDto.MemberBasicTokenResDto?> {
-        return ApiUtils.success(memberService.logIn(createReq))
+    fun signIn(@RequestBody memberDto: MemberDto.MemberReqDto): ApiUtil.ApiResult<MemberDto.MemberBasicTokenResDto?> {
+        return ApiUtil.success(memberService.signIn(memberDto))
     }
 
     @PostMapping("/fcm")
-    fun postFcmToken(@RequestHeader("Authorization") token: String, @RequestBody createReq: MemberDto.MemberFcmReqDto): ApiUtils.ApiResult<Boolean?> {
-        return ApiUtils.success(memberService.postFcmToken(createReq, token))
+    fun postFcmToken(
+        @RequestHeader("Authorization") token: String,
+        @RequestBody fcmDto: MemberDto.MemberFcmReqDto
+    ): ApiUtil.ApiResult<Boolean?> {
+        return ApiUtil.success(memberService.postFcmToken(fcmDto, token))
     }
 
     @PostMapping("/alarm")
-    fun postAlarm(@RequestHeader("Authorization") token: String, @RequestBody postAlarmReqDto:AlarmDto): ApiUtils.ApiResult<AlarmDto?> {
-        return ApiUtils.success(memberService.postAlarm(postAlarmReqDto,token))
+    fun postAlarm(
+        @RequestHeader("Authorization") token: String,
+        @RequestBody alarmReqDto: AlarmDto
+    ): ApiUtil.ApiResult<AlarmDto?> {
+        return ApiUtil.success(memberService.postAlarm(alarmReqDto, token))
     }
 
+    //개발용
     @GetMapping
-    fun getMemberList(): ApiUtils.ApiResult<List<MemberDto.MemberResDto?>> {
-        return ApiUtils.success(memberService.getMemberList())
+    fun getMembers(): ApiUtil.ApiResult<List<MemberDto.MemberResDto?>> {
+        return ApiUtil.success(memberService.getMembers())
     }
 
     @GetMapping("/alarm")
-    fun getAlarmSetting(@RequestHeader("Authorization") token: String): ApiUtils.ApiResult<AlarmDto?> {
-        return ApiUtils.success(memberService.getAlarm(token))
+    fun getAlarm(@RequestHeader("Authorization") token: String): ApiUtil.ApiResult<AlarmDto?> {
+        return ApiUtil.success(memberService.getAlarm(token))
     }
 }

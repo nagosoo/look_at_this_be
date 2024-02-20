@@ -4,10 +4,10 @@ import com.eunji.look_at_this.api.dto.AlarmDto
 import com.eunji.look_at_this.api.dto.MemberDto
 
 interface MemberService {
-    fun createMember(memberReqDto: MemberDto.MemberReqDto): MemberDto.MemberBasicTokenResDto?
-    fun logIn(memberReqDto: MemberDto.MemberReqDto): MemberDto.MemberBasicTokenResDto?
-    fun getMemberList(): List<MemberDto.MemberResDto?>
-    fun postFcmToken(memberFcmReqDto: MemberDto.MemberFcmReqDto, token: String): Boolean?
-    fun postAlarm(memberAlarmSettingPostReqDto: AlarmDto, token: String): AlarmDto?
-    fun getAlarm(token:String): AlarmDto?
+    fun signUp(memberReqDto: MemberDto.MemberReqDto): MemberDto.MemberBasicTokenResDto?
+    fun signIn(memberReqDto: MemberDto.MemberReqDto): MemberDto.MemberBasicTokenResDto?
+    fun getMembers(): List<MemberDto.MemberResDto?>
+    fun postFcmToken(fcmReqDto: MemberDto.MemberFcmReqDto, token: String): Boolean?
+    fun postAlarm(alarmReqDto: AlarmDto, token: String): AlarmDto?
+    fun getAlarm(token: String): AlarmDto?
 }
