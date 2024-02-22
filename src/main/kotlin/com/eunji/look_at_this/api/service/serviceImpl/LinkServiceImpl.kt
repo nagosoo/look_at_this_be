@@ -127,7 +127,7 @@ class LinkServiceImpl(
         val bookmarkLinks: List<Link> = allLinks.filter {
             it.bookMarkHistories.any { it.member?.memberId == memberId }
         }
-        val lastIdOfList: Long? = if (bookmarkLinks.isEmpty()) null else bookmarkLinks.last().linkId
+        val lastIdOfList: Long? = if (allLinks.isEmpty()) null else allLinks.last().linkId
         val readLinks = getReadLinks(memberId)
 
         val linksRes = bookmarkLinks.map {
