@@ -55,7 +55,8 @@ class LinkServiceImpl(
             linkThumbnail = LinkUtil.getThumbnail(absoluteUrl),
             linkCreatedAt = LocalDateTime.now()
         ).apply {
-            postFcm()
+            val writerId = TokenUtil.getMemberIdByToken(token, memberRepository)
+            postFcm(writerId)
             val savedLink = linkRepository.save(this).apply {
                 read(token, LinkDto.LinkReadOrBookmarkReqDto(linkId))
             }
@@ -71,9 +72,9 @@ class LinkServiceImpl(
         }
     }
 
-    private fun postFcm() {
-        memberRepository.findAll().filter {
-            it.keepReceiveAlarms
+    private fun postFcm(writerId: Long? = null) {
+        memberRepository.findAll().filter {member->
+            member.memberId!=writerId && member.keepReceiveAlarms
         }.map {
             it.memberFcmToken
         }.forEach { fcmToken ->
